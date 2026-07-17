@@ -1,7 +1,7 @@
 {
-  "name": "John's UCI CS Study Hub",
-  "short_name": "John Study",
-  "description": "UC Irvine CS freshman study tracker — ICS 31/32/33 + MATH 2A",
+  "name": "UCI CS Study Hub",
+  "short_name": "CS Study",
+  "description": "UC Irvine CS study tracker — ICS 31/32/33 + MATH 2A",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

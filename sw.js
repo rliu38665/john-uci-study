@@ -1,8 +1,9 @@
-// John's UCI CS Study Hub — service worker (network-first for content)
-const CACHE = 'john-study-v2';
+// UCI CS Study Hub — service worker (locked build)
+const CACHE = 'uci-study-locked-v1';
 const ASSETS = [
   './',
   './index.html',
+  './app.enc',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
@@ -20,15 +21,17 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Network-first for the page/HTML so John always gets the latest version when online;
-// falls back to the cached copy only when offline. Other assets: cache-first with refresh.
+// Network-first for the gate page and the encrypted blob so the latest version is
+// fetched when online; fall back to cache when offline. Other assets: cache-first.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  const url = e.request.url;
   const isDoc = e.request.mode === 'navigate' ||
-    (e.request.destination === 'document') ||
-    e.request.url.endsWith('/') || e.request.url.endsWith('index.html');
+    e.request.destination === 'document' ||
+    url.endsWith('/') || url.endsWith('index.html');
+  const isBlob = url.endsWith('app.enc');
 
-  if (isDoc) {
+  if (isDoc || isBlob) {
     e.respondWith(
       fetch(e.request).then(res => {
         const copy = res.clone();
