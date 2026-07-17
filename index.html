@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="John Study">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0064a4">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>John's UCI CS Study Hub — ICS 31 / 32 / 33 / MATH 2A</title>
+<style>
+  :root{
+    --uci-blue:#0064a4; --uci-gold:#ffd200; --ink:#1c2b39; --muted:#6b7a89;
+    --bg:#f4f7fb; --card:#ffffff; --line:#e3e9f0; --good:#1e9e5a; --warn:#e8890c; --bad:#d64545;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  header{background:linear-gradient(120deg,var(--uci-blue),#00487a);color:#fff;padding:18px 22px}
+  header h1{margin:0;font-size:20px}
+  header p{margin:4px 0 0;opacity:.85;font-size:13px}
+  .wrap{max-width:1000px;margin:0 auto;padding:16px}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;flex:1;min-width:150px}
+  .tab .c{font-weight:700;font-size:14px}
+  .tab .s{color:var(--muted);font-size:12px}
+  .tab.active{background:var(--uci-blue);color:#fff;border-color:var(--uci-blue)}
+  .tab.active .s{color:#dbeaf7}
+  .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .countdown{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .countdown b{color:var(--uci-blue);font-size:15px}
+  .countdown .exam{color:var(--bad);font-weight:600}
+  .setdate{font-size:12px;color:var(--muted)}
+  .setdate input{border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:12px}
+  .progress-overall{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:16px}
+  .pbar{height:12px;background:#e9eef4;border-radius:8px;overflow:hidden;margin-top:8px}
+  .pbar>span{display:block;height:100%;background:linear-gradient(90deg,var(--good),#37c47f);width:0%}
+  .weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+  .wk{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:.15s;position:relative}
+  .wk:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,80,160,.12)}
+  .wk .n{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.5px}
+  .wk .t{font-size:14px;font-weight:600;margin:4px 0 8px;line-height:1.3}
+  .wk .mini{height:6px;background:#e9eef4;border-radius:4px;overflow:hidden}
+  .wk .mini>span{display:block;height:100%;background:var(--good);width:0}
+  .tag{position:absolute;top:10px;right:10px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .tag.mid{background:#fff2e0;color:var(--warn)}
+  .tag.fin{background:#ffe3e3;color:var(--bad)}
+  .tag.lab{background:#e5f0ff;color:var(--uci-blue)}
+  .tag.rev{background:#eef1f4;color:var(--muted)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin-bottom:20px;overflow:hidden;display:none}
+  .panel.open{display:block}
+  .phead{background:var(--uci-blue);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+  .phead h2{margin:0;font-size:17px}
+  .phead .close{cursor:pointer;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:13px}
+  .pbody{padding:18px}
+  .sec{margin-bottom:18px}
+  .sec h3{font-size:14px;color:var(--uci-blue);margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px}
+  .kp{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px}
+  .kp .name{flex:1;font-size:14px}
+  .kp select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;background:#fff}
+  .kp.mastered{background:#eefbf3;border-color:#bfe8cf}
+  .kp.learning{background:#fff8ec;border-color:#f2ddb4}
+  .q{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+  .q .stem{font-size:14px;font-weight:600;margin-bottom:8px}
+  .dbadge{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:middle;letter-spacing:.3px}
+  .d1{background:#e6f4ea;color:#1e7e34}
+  .d2{background:#fff3cd;color:#8a6d00}
+  .d3{background:#fde2e2;color:#b02a2a}
+  .qfilter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .qfilter button{font-size:12px;padding:5px 11px;border:1px solid var(--line);border-radius:20px;background:#fff;cursor:pointer;color:var(--ink)}
+  .qfilter button.on{background:var(--uci-blue);color:#fff;border-color:var(--uci-blue)}
+  .q .opt{display:block;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13.5px}
+  .q .opt:hover{background:#f4f8fd}
+  .q .opt.correct{background:#eefbf3;border-color:var(--good)}
+  .q .opt.wrong{background:#fdecec;border-color:var(--bad)}
+  .q .exp{font-size:12.5px;color:var(--muted);margin-top:6px;display:none}
+  .q .exp.show{display:block}
+  .proj{background:#f4f8fd;border:1px dashed var(--uci-blue);border-radius:10px;padding:12px;font-size:13.5px}
+  .proj b{color:var(--uci-blue)}
+  .askhint{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+  .askbox{width:100%;min-height:64px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13.5px;font-family:inherit;resize:vertical}
+  .askbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .reslinks{display:flex;flex-direction:column;gap:6px}
+  .reslink{display:block;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;text-decoration:none;background:#f9fbfe;color:var(--ink)}
+  .reslink:hover{background:#eef5fd;border-color:var(--uci-blue)}
+  .mistakes{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:30px}
+  .mistakes h2{font-size:16px;margin:0 0 12px;color:var(--uci-blue)}
+  .mrow{border-left:3px solid var(--bad);background:#fdf6f6;padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:8px;font-size:13px}
+  .mrow .wkt{font-size:11px;color:var(--muted);font-weight:600}
+  .empty{color:var(--muted);font-size:13px}
+  .btn{background:var(--uci-blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--uci-blue);border:1px solid var(--uci-blue)}
+  .weakspots{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:20px}
+  .weakspots h2{font-size:16px;margin:0 0 6px;color:var(--uci-blue)}
+  .weakspots .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .wcard{border-left:3px solid var(--warn);background:#fff8ec;padding:10px 14px;border-radius:0 10px 10px 0;margin-bottom:10px}
+  .wcard .wh{font-size:14px;font-weight:700}
+  .wcard .wmeta{font-size:11.5px;color:var(--muted);margin:2px 0 6px}
+  .wcard .tip{font-size:13px;background:#fff;border:1px dashed var(--warn);border-radius:8px;padding:8px 10px;margin:6px 0;line-height:1.45}
+  .wcard .tip b{color:var(--warn)}
+  .wcard .wbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .wcard .wbtns .btn{padding:6px 12px;font-size:12.5px}
+  .drill-ov{position:fixed;inset:0;background:rgba(12,30,50,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+  .drill-ov.open{display:flex}
+  .drill{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
+  .drill .dh{background:var(--uci-blue);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+  .drill .dh h3{margin:0;font-size:16px}
+  .drill .dh .close{cursor:pointer;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 10px;font-size:13px}
+  .drill .db{padding:18px}
+  .drill .dprog{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .drill .dprog .pbar{height:10px;background:#e9eef4;border-radius:6px;overflow:hidden;margin-top:6px}
+  .drill .dprog .pbar>span{display:block;height:100%;background:linear-gradient(90deg,var(--good),#37c47f)}
+  .drill .dstem{font-size:15px;font-weight:600;margin-bottom:12px}
+  .drill .dopt{display:block;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:8px;cursor:pointer;font-size:14px}
+  .drill .dopt:hover{background:#f4f8fd}
+  .drill .dopt.correct{background:#eefbf3;border-color:var(--good)}
+  .drill .dopt.wrong{background:#fdecec;border-color:var(--bad)}
+  .drill .dexp{font-size:13px;color:var(--muted);margin:8px 0;display:none}
+  .drill .dexp.show{display:block}
+  .drill .ddone{text-align:center;padding:20px}
+  .drill .ddone .big{font-size:44px}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+  a{color:var(--uci-blue)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🐜 John's UCI CS Study Hub</h1>
+  <p>UC Irvine · Computer Science · Fall = ICS 31 + MATH 2A · CS sequence ICS 31 → 32 → 33 · 10-week quarter tracker</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+
+  <div class="bar">
+    <div class="countdown" id="countdown"></div>
+    <div class="setdate">Quarter start (Week 1 Monday):
+      <input type="date" id="startDate">
+    </div>
+  </div>
+
+  <div class="progress-overall">
+    <div style="display:flex;justify-content:space-between;font-size:13px">
+      <span><b id="pctText">0%</b> mastered in this course</span>
+      <button class="btn ghost" onclick="resetCourse()">Reset this course</button>
+    </div>
+    <div class="pbar"><span id="overallBar"></span></div>
+  </div>
+
+  <div class="weeks" id="weeks"></div>
+  <div class="panel" id="panel"></div>
+
+  <div class="weakspots" id="weakspots"></div>
+
+  <div class="mistakes">
+    <h2>📕 Mistake Notebook <span id="mCourse" style="font-size:12px;color:var(--muted)"></span></h2>
+    <div id="mistakeList"></div>
+  </div>
+</div>
+
+<div class="drill-ov" id="drillOv" onclick="if(event.target===this)closeDrill()"><div class="drill" id="drill"></div></div>
+
+<footer>
+  Built for John by Meimei · Content mapped to UCI official weekly schedules ·
+  <a href="https://ics.uci.edu/~pattis/ICS-31/weeklyschedule.html" target="_blank">ICS31</a> ·
+  <a href="https://ics.uci.edu/~thornton/ics32/Schedule.html" target="_blank">ICS32</a> ·
+  <a href="https://ics.uci.edu/~thornton/ics33/Schedule.html" target="_blank">ICS33</a> ·
+  <a href="https://ocw.uci.edu/courses/math_2a_calculus_i.html" target="_blank">MATH2A</a>
+</footer>
+
+<script>
+// ================= COURSE CONTENT =================
+const COURSES = {
+ ics31:{ code:"ICS 31", name:"Introduction to Programming", term:"Fall", start:"2026-09-28",
+  exams:{6:"MIDTERM",10:"LAB EXAM",11:"FINAL EXAM"},
+  weeks:[
+   {n:1,title:"Syntax, Tokens & Lexical Structure",
+    topics:["Program basics / IDLE & Python 3","EBNF syntax notation","Tokens: keywords, identifiers, literals","Data types: int, float, str, bool"],
+    quiz:[{stem:"Which is a valid Python identifier?",opts:["2score","total_score","class","my-score"],a:1,d:1,exp:"Can't start with a digit, can't be a keyword, no '-'."},
+          {stem:"What type is 3.0 ?",opts:["int","str","float","bool"],a:2,d:1,exp:"Decimal point → float."},
+          {stem:"Which of these IS a Python keyword?",opts:["print","input","return","len"],a:2,d:2,exp:"print/input/len are built-in functions; 'return' is a reserved keyword."},
+          {stem:"How many tokens are in:  x = 3 + 4",opts:["3","4","5","6"],a:2,d:2,exp:"Tokens: x, =, 3, +, 4 → 5 tokens."},
+          {stem:"Which numeric literal is INVALID in Python 3?",opts:["0b101","1_000","0x1F","09"],a:3,d:3,exp:"A leading-zero decimal like 09 is invalid; use 0o for octal."},
+          {stem:"Which line is a syntax error?",opts:["x = 5","print('hi')","if x = 5:","y = x + 1"],a:2,d:2,exp:"Assignment uses =, comparison uses ==; 'if x = 5:' is invalid."},
+          {stem:"What is type(5 == 5)?",opts:["int","bool","str","float"],a:1,d:3,exp:"A comparison evaluates to a bool (here True)."},
+          {stem:"Which is NOT a valid Python identifier?",opts:["_hidden","my2var","3rd_place","Total"],a:2,d:1,exp:"Identifiers can't start with a digit → '3rd_place' is invalid."},
+          {stem:"What type is the literal True?",opts:["int","str","bool","float"],a:2,d:1,exp:"True/False are bool values."},
+          {stem:"What type does input() always return?",opts:["int","str","float","bool"],a:1,d:2,exp:"input() returns a str; convert with int()/float() if needed."},
+          {stem:"Which is a string literal?",opts:["42","'hello'","True","3.14"],a:1,d:1,exp:"Quotes make a str literal."},
+          {stem:"In EBNF notation, what is being described?",opts:["Runtime speed","The grammar/syntax rules of the language","Memory use","Variable values"],a:1,d:2,exp:"EBNF is a notation for a language's grammar."},
+          {stem:"int('7') + 3 evaluates to?",opts:["'73'","10","'10'","Error"],a:1,d:2,exp:"int('7') is 7, then 7+3=10."},
+          {stem:"Which line correctly assigns then prints a variable?",opts:["print x = 5","x = 5; print(x)","x == 5 print(x)","5 = x"],a:1,d:3,exp:"Assign with =, then call print(x)."}],
+    project:"Hello program: use 3 print statements to print your name, your major, and a one-line self-introduction."},
+   {n:2,title:"Modules, Function Headers & Operators",
+    topics:["import modules (math, random)","Reading a function header","Operators + - * / // % **","Operator precedence"],
+    quiz:[{stem:"17 // 5 = ?",opts:["3.4","3","2","4"],a:1,d:1,exp:"// is integer division, 17//5=3."},
+          {stem:"2 ** 3 = ?",opts:["6","8","9","5"],a:1,d:1,exp:"** is exponent, 2^3=8."},
+          {stem:"What is 17 % 5 ?",opts:["2","3","3.4","0"],a:0,d:2,exp:"% is the remainder: 17 = 3*5 + 2."},
+          {stem:"Evaluate: 2 + 3 * 4 ** 2",opts:["80","50","400","144"],a:1,d:2,exp:"** first (16), then * (48), then + → 50."},
+          {stem:"After  import math as m , how do you get pi?",opts:["math.pi","pi","m.pi","m(pi)"],a:2,d:3,exp:"The alias replaces the name: use m.pi."},
+          {stem:"-7 // 2 in Python = ?",opts:["-3","-4","-3.5","3"],a:1,d:3,exp:"Floor division rounds toward negative infinity → -4."},
+          {stem:"After  from random import randint , how do you call it?",opts:["random.randint(1,6)","randint(1,6)","random(1,6)","randint.random(1,6)"],a:1,d:2,exp:"'from x import y' brings y directly into scope."},
+          {stem:"10 / 4 in Python 3 = ?",opts:["2","2.5","2.0","3"],a:1,d:1,exp:"Single / is true division → 2.5."},
+          {stem:"3 * 2 + 1 = ?",opts:["9","7","6","5"],a:1,d:1,exp:"* before + → 6+1=7."},
+          {stem:"import random; random.randint(1,6) can return?",opts:["0","6","7","1.5"],a:1,d:2,exp:"randint(1,6) is inclusive of both ends → 1..6."},
+          {stem:"10 % 3 = ?",opts:["1","3","0","3.33"],a:0,d:2,exp:"Remainder of 10÷3 is 1."},
+          {stem:"Which operator has the HIGHEST precedence?",opts:["+","*","**","//"],a:2,d:2,exp:"Exponent ** binds tightest."},
+          {stem:"2 ** 2 ** 3 = ?",opts:["64","256","512","12"],a:1,d:3,exp:"** is right-associative: 2**(2**3)=2**8=256."},
+          {stem:"A function header 'def area(r):' tells you the function's?",opts:["Return value","Name and parameters","Speed","Memory"],a:1,d:3,exp:"The header shows the name and its parameter list."}],
+    project:"Use the math module to compute a circle's area: input the radius, output math.pi*r**2."},
+   {n:3,title:"Expressions, if & for loops",
+    topics:["Boolean & comparison operators","if / elif / else","for loops over range() & strings","Accumulator pattern"],
+    quiz:[{stem:"for i in range(1,5): how many iterations?",opts:["5","4","3","6"],a:1,d:1,exp:"range(1,5)=1,2,3,4 → 4 times."},
+          {stem:"Which keyword handles 'otherwise'?",opts:["elif","else","otherwise","default"],a:1,d:1,exp:"else runs when all conditions are false."},
+          {stem:"What does range(0,10,2) produce?",opts:["0,2,4,6,8","0 through 10","2,4,6,8,10","0,1,...,10"],a:0,d:2,exp:"Start 0, stop before 10, step 2."},
+          {stem:"x=7; if x>5 and x<10: print('mid') — what prints?",opts:["Nothing","mid","Error","7"],a:1,d:2,exp:"7>5 and 7<10 are both True → 'mid'."},
+          {stem:"total=0; for i in range(1,4): total+=i — final total?",opts:["3","6","10","4"],a:1,d:3,exp:"1+2+3 = 6 (accumulator pattern)."},
+          {stem:"s='abc'; for c in s: print(c,end='') — output?",opts:["abc","a b c","a\\nb\\nc","cba"],a:0,d:2,exp:"Iterates characters; end='' prevents newlines → abc."},
+          {stem:"How many iterations: for i in range(2,10,3)?",opts:["2","3","4","8"],a:1,d:3,exp:"Values 2,5,8 → 3 iterations."},
+          {stem:"5 > 3 evaluates to?",opts:["1","True","'yes'","5"],a:1,d:1,exp:"A comparison yields a bool → True."},
+          {stem:"How many times: for i in range(3)?",opts:["2","3","4","0"],a:1,d:1,exp:"range(3)=0,1,2 → 3 iterations."},
+          {stem:"x=10; print('big' if x>5 else 'small')",opts:["big","small","10","Error"],a:0,d:2,exp:"10>5 is True → 'big'."},
+          {stem:"not (True and False) = ?",opts:["True","False","None","Error"],a:0,d:2,exp:"True and False → False; not False → True."},
+          {stem:"c=0; for ch in 'hello': c+=1 — final c?",opts:["4","5","6","0"],a:1,d:2,exp:"'hello' has 5 characters."},
+          {stem:"for i in range(5,0,-1): first value is?",opts:["0","1","5","4"],a:2,d:3,exp:"Starts at 5 and steps down → 5 first."},
+          {stem:"if x>0: ... elif x>10: — when x=20 which branch runs?",opts:["The elif","The first if (x>0)","Both","Neither"],a:1,d:3,exp:"20>0 is True first, so the if runs; the elif is skipped."}],
+    project:"FizzBuzz: print 1-30; print Fizz for multiples of 3, Buzz for multiples of 5."},
+   {n:4,title:"while loops, try/except & Debugging",
+    topics:["while loops & conditions","break / continue","Exceptions: try / except","Reading tracebacks / debugging"],
+    quiz:[{stem:"Which loop is best when the number of repetitions is unknown?",opts:["for","while","range","map"],a:1,d:1,exp:"while runs by a condition, good for an unknown count."},
+          {stem:"What does try/except guard against?",opts:["Slow code","Runtime exceptions","Syntax errors","Comments"],a:1,d:1,exp:"It catches runtime exceptions so the program doesn't crash."},
+          {stem:"What does 'break' do inside a loop?",opts:["Skip to next iteration","Exit the loop immediately","Restart the loop","Pause 1 second"],a:1,d:2,exp:"break leaves the loop; continue skips to the next iteration."},
+          {stem:"int('abc') raises which exception?",opts:["TypeError","ValueError","KeyError","IndexError"],a:1,d:2,exp:"The string isn't a valid number → ValueError."},
+          {stem:"i=0; while i<3: print(i)  (no i+=1) — what happens?",opts:["Prints 0 1 2","Infinite loop","Prints nothing","Error"],a:1,d:3,exp:"i never changes, so the condition stays True forever."},
+          {stem:"n=5; while n>0: n-=2 — final value of n?",opts:["0","-1","1","-2"],a:1,d:3,exp:"5→3→1→-1; loop stops once n>0 is False."},
+          {stem:"try: x=1/0 except ZeroDivisionError: x=0 — x becomes?",opts:["1","0","None","crash"],a:1,d:2,exp:"The exception is caught, so x is set to 0."},
+          {stem:"continue does what?",opts:["Exit the loop","Skip to the next iteration","Pause","Restart the program"],a:1,d:1,exp:"continue jumps to the next loop iteration."},
+          {stem:"A while loop repeats while its condition is?",opts:["False","True","Zero","Empty"],a:1,d:1,exp:"It runs as long as the condition stays True."},
+          {stem:"Where does a traceback point?",opts:["The fastest line","The line where the error occurred","Line 1","The import"],a:1,d:2,exp:"It shows the call stack ending at the error's location."},
+          {stem:"except ValueError as e: — what is e?",opts:["A number","The exception object/message","The file","None"],a:1,d:2,exp:"e binds the caught exception, holding its details."},
+          {stem:"i=1; while i<=3: print(i); i+=1 — how many prints?",opts:["2","3","4","infinite"],a:1,d:2,exp:"i=1,2,3 → 3 prints."},
+          {stem:"A finally block runs?",opts:["Only on error","Only on success","Always, error or not","Never"],a:2,d:3,exp:"finally always executes, useful for cleanup."},
+          {stem:"while True: with no break creates?",opts:["One pass","An infinite loop","A syntax error","Nothing"],a:1,d:3,exp:"Without break/return it never stops."}],
+    project:"Input validation: keep prompting until you get a valid integer (using try/except)."},
+   {n:5,title:"Functions & Modules, Testing, lambda",
+    topics:["def: parameters & return","Local vs global scope","Testing functions (assert)","lambda expressions"],
+    quiz:[{stem:"A function with no return statement returns?",opts:["0","''","None","Error"],a:2,d:1,exp:"It returns None by default."},
+          {stem:"Which lambda doubles x?",opts:["lambda x: x*2","def x*2","lambda: x*2 x","x => x*2"],a:0,d:1,exp:"lambda x: x*2."},
+          {stem:"def f(a,b=2): return a+b — what is f(3)?",opts:["3","5","Error","2"],a:1,d:2,exp:"b uses its default 2 → 3+2=5."},
+          {stem:"A variable created inside a function is?",opts:["Global","Local to that function","A constant","Shared everywhere"],a:1,d:2,exp:"It has local scope and disappears when the function returns."},
+          {stem:"assert add(2,3)==5 does what if add returns 6?",opts:["Prints 6","Raises AssertionError","Returns True","Nothing"],a:1,d:3,exp:"A failed assert raises AssertionError — that's how tests catch bugs."},
+          {stem:"def f(*a): return len(a) — what is f(1,2,3)?",opts:["1","3","6","Error"],a:1,d:3,exp:"*a collects the arguments into a tuple of length 3."},
+          {stem:"g=lambda x,y=10: x+y — what is g(5)?",opts:["5","10","15","Error"],a:2,d:2,exp:"y uses its default 10 → 5+10=15."},
+          {stem:"def add(a,b): return a+b — add(2,3) is?",opts:["23","5","'5'","None"],a:1,d:1,exp:"2+3=5."},
+          {stem:"A lambda can contain?",opts:["Many statements","A single expression","Loops","Class defs"],a:1,d:1,exp:"Lambdas are limited to one expression."},
+          {stem:"return with no value gives back?",opts:["0","None","''","Error"],a:1,d:2,exp:"A bare return yields None."},
+          {stem:"To rebind a global var inside a function, declare?",opts:["nonlocal","global x","local x","static x"],a:1,d:2,exp:"'global x' lets you assign to the module-level variable."},
+          {stem:"(lambda x:x*x)(4) = ?",opts:["8","16","4","x*x"],a:1,d:2,exp:"Immediately-called lambda squares 4 → 16."},
+          {stem:"assert 2+2==4 does what?",opts:["Prints 4","Nothing (passes silently)","Raises an error","Returns True"],a:1,d:3,exp:"A true assertion passes with no output."},
+          {stem:"def f(a,b): return a-b — f(b=2,a=5) is?",opts:["-3","3","7","Error"],a:1,d:3,exp:"Keyword args: a=5, b=2 → 5-2=3."}],
+    project:"Write is_prime(n) and test a few examples with assert."},
+   {n:6,title:"Lists & Comprehensions · MIDTERM",
+    topics:["List indexing & slicing","Methods: append, pop, sort","Iterating lists","List comprehensions"],
+    quiz:[{stem:"[10,20,30][-1] = ?",opts:["10","20","30","Error"],a:2,d:1,exp:"-1 is the last element → 30."},
+          {stem:"[x*x for x in range(4)] = ?",opts:["[0,1,4,9]","[1,4,9,16]","[0,1,2,3]","[1,2,3,4]"],a:0,d:1,exp:"The squares of 0,1,2,3."},
+          {stem:"nums=[1,2,3,4]; nums[1:3] = ?",opts:["[2,3]","[1,2,3]","[2,3,4]","[1,2]"],a:0,d:2,exp:"Slice from index 1 up to (not including) 3."},
+          {stem:"[x for x in range(6) if x%2==0] = ?",opts:["[0,2,4]","[1,3,5]","[0,1,2,3,4,5]","[2,4,6]"],a:0,d:2,exp:"Keeps even numbers 0,2,4."},
+          {stem:"a=[1,2]; b=a; b.append(3); print(a)",opts:["[1,2]","[1,2,3]","Error","[3]"],a:1,d:3,exp:"b and a point to the SAME list (aliasing), so a changes too."},
+          {stem:"[i+j for i in [1,2] for j in [10,20]] = ?",opts:["[11,21,12,22]","[11,12,21,22]","[11,22]","[10,20,10,20]"],a:0,d:3,exp:"Nested comprehension: i=1→11,21 then i=2→12,22."},
+          {stem:"len([x for x in range(10) if x%3==0]) = ?",opts:["3","4","5","10"],a:1,d:2,exp:"0,3,6,9 → 4 elements."},
+          {stem:"[1,2,3].append(4) makes the list?",opts:["[1,2,3]","[1,2,3,4]","[4,1,2,3]","Error"],a:1,d:1,exp:"append adds to the end."},
+          {stem:"len([5,6,7]) = ?",opts:["2","3","4","7"],a:1,d:1,exp:"Three elements."},
+          {stem:"[0,1,2,3,4][1:4] = ?",opts:["[1,2,3]","[1,2,3,4]","[0,1,2,3]","[2,3,4]"],a:0,d:2,exp:"Indices 1,2,3 (stop 4 excluded)."},
+          {stem:"nums=[3,1,2]; nums.pop() returns?",opts:["3","1","2","None"],a:2,d:2,exp:"pop() removes and returns the last element → 2."},
+          {stem:"[x+1 for x in [0,1,2]] = ?",opts:["[0,1,2]","[1,2,3]","[1,2,3,4]","[2,3,4]"],a:1,d:2,exp:"Add 1 to each element."},
+          {stem:"lst[::-1] does what?",opts:["Sorts it","Reverses the list","Empties it","Doubles it"],a:1,d:3,exp:"A step of -1 reverses the sequence."},
+          {stem:"[x*2 for x in range(3) if x>0] = ?",opts:["[0,2,4]","[2,4]","[1,2]","[2,4,6]"],a:1,d:3,exp:"Only x=1,2 kept → [2,4]."}],
+    project:"Midterm review: from a list of numbers compute the sum / average / max / list of even numbers (using comprehensions)."},
+   {n:7,title:"Tuples, Named Tuples & Dictionaries",
+    topics:["Tuples & immutability","namedtuple","Dict: key/value, get, in","Iterating dict items"],
+    quiz:[{stem:"Main difference between a tuple and a list?",opts:["A tuple is immutable","A tuple can't hold numbers","A list is always faster","No difference"],a:0,d:1,exp:"A tuple can't be changed after it is created."},
+          {stem:"Safely get key 'age' with a default of 0?",opts:["d['age']","d.get('age',0)","d.age","get(d,'age')"],a:1,d:1,exp:"Returns 0 when missing instead of crashing."},
+          {stem:"d={'a':1,'b':2}; 'a' in d evaluates to?",opts:["True","1","False","Error"],a:0,d:2,exp:"'in' checks keys, and 'a' is a key → True."},
+          {stem:"t=(5,) — what is t?",opts:["The int 5","A one-element tuple","A syntax error","A list"],a:1,d:2,exp:"The trailing comma makes it a tuple, not just parentheses."},
+          {stem:"for k,v in d.items(): — what are k and v?",opts:["Two keys","Index and value","Key and value","Value and key"],a:2,d:3,exp:".items() yields (key, value) pairs."},
+          {stem:"d={}; d[(1,2)]=3 — is this valid?",opts:["No, tuples can't be keys","Yes, tuples are hashable","Only strings allowed","Error"],a:1,d:3,exp:"Immutable tuples are hashable, so they work as dict keys."},
+          {stem:"a,b=1,2; a,b=b,a; print(a,b)",opts:["1 2","2 1","1 1","Error"],a:1,d:2,exp:"Tuple swap: a becomes 2, b becomes 1."},
+          {stem:"A tuple is written with?",opts:["[]","()","{}","<>"],a:1,d:1,exp:"Parentheses (or commas) make a tuple."},
+          {stem:"d={'a':1}; d['a'] = ?",opts:["'a'","1","{'a':1}","Error"],a:1,d:1,exp:"Look up the value for key 'a' → 1."},
+          {stem:"t=(1,2,3); t[0]=9 does what?",opts:["Sets t to (9,2,3)","Raises TypeError","Nothing","Returns 9"],a:1,d:2,exp:"Tuples are immutable → TypeError."},
+          {stem:"len({'a':1,'b':2}) = ?",opts:["1","2","4","0"],a:1,d:2,exp:"Two key/value pairs → length 2."},
+          {stem:"d.keys() returns?",opts:["The values","A view of the keys","One key","The length"],a:1,d:2,exp:"keys() gives a view of all the keys."},
+          {stem:"P=namedtuple('P','x y'); P(1,2).x = ?",opts:["1","2","'x'","Error"],a:0,d:3,exp:"Access the named field x → 1."},
+          {stem:"d={'a':1}; d['b']=2; len(d) = ?",opts:["1","2","3","0"],a:1,d:3,exp:"Adding key 'b' makes 2 entries."}],
+    project:"Word count: count how many times each word appears and print the top 3."},
+   {n:8,title:"Dict Review, Sets & Intro to Classes",
+    topics:["Nested dictionaries","Sets & frozensets, set ops","Using existing objects","Attributes & methods"],
+    quiz:[{stem:"{1,2,2,3} as a set is?",opts:["{1,2,2,3}","{1,2,3}","[1,2,3]","Error"],a:1,d:1,exp:"A set removes duplicates."},
+          {stem:"Common elements of a and b use?",opts:["a | b","a & b","a - b","a ^ b"],a:1,d:1,exp:"& is intersection."},
+          {stem:"{1,2,3} | {3,4} = ?",opts:["{3}","{1,2,3,4}","{1,2,4}","{1,2,3,3,4}"],a:1,d:2,exp:"| is union; duplicates collapse."},
+          {stem:"d={'x':{'y':1}}; d['x']['y'] = ?",opts:["1","{'y':1}","Error","x"],a:0,d:2,exp:"Nested dict access: outer 'x' then inner 'y'."},
+          {stem:"Can a set contain a list, e.g. {[1,2]}?",opts:["Yes","No — lists are unhashable","Only if short","Only numbers"],a:1,d:3,exp:"Set members must be hashable; lists are mutable/unhashable."},
+          {stem:"{1,2,3} - {2} = ?",opts:["{1,3}","{2}","{1,2,3}","{3}"],a:0,d:2,exp:"Set difference removes 2 → {1,3}."},
+          {stem:"len({1,1,2,3,3,3}) = ?",opts:["6","3","2","4"],a:1,d:3,exp:"Duplicates collapse → {1,2,3} → length 3."},
+          {stem:"set([1,1,2,3]) = ?",opts:["{1,2,3}","[1,2,3]","{1,1,2,3}","(1,2,3)"],a:0,d:1,exp:"Duplicates are removed."},
+          {stem:"An empty set is created with?",opts:["{}","set()","[]","()"],a:1,d:1,exp:"{} makes an empty dict; use set() for a set."},
+          {stem:"{1,2} ^ {2,3} (symmetric difference) = ?",opts:["{2}","{1,3}","{1,2,3}","{}"],a:1,d:2,exp:"^ keeps items in exactly one set → {1,3}."},
+          {stem:"'hi'.upper() returns?",opts:["'hi'","'HI'","'Hi'","Error"],a:1,d:2,exp:"The str method returns 'HI'."},
+          {stem:"A frozenset differs from a set because it is?",opts:["Bigger","Immutable","Sorted","Slower"],a:1,d:2,exp:"frozenset can't be modified after creation."},
+          {stem:"data={'u':{'age':20}}; data['u']['age'] = ?",opts:["20","{'age':20}","'age'","Error"],a:0,d:3,exp:"Nested access: outer 'u' then 'age' → 20."},
+          {stem:"2 in {1,2,3} evaluates to?",opts:["True","False","2","Error"],a:0,d:3,exp:"Membership test → True."}],
+    project:"Use sets to find the intersection of two lists plus the elements unique to each."},
+   {n:9,title:"Writing Classes & OOP Design",
+    topics:["class & __init__","self & instance attributes","Methods","__str__ & OOP design"],
+    quiz:[{stem:"What does __init__ do?",opts:["Print the object","Initialize a new object's attributes","Delete the object","Import a module"],a:1,d:1,exp:"It's the constructor; it sets the initial state."},
+          {stem:"In a method, self refers to?",opts:["The class name","The current object/instance","A global variable","A module"],a:1,d:1,exp:"self is the instance the method was called on."},
+          {stem:"class Dog: def __init__(s,n): s.name=n — how to make one?",opts:["Dog.name('Rex')","Dog('Rex')","new Dog('Rex')","Dog{'Rex'}"],a:1,d:2,exp:"Call the class like a function; __init__ runs automatically."},
+          {stem:"What does __str__ control?",opts:["Object deletion","How print() shows the object","Addition","Sorting"],a:1,d:2,exp:"__str__ returns the human-readable text for print()."},
+          {stem:"Two objects of the same class share instance attributes?",opts:["Yes, always","No, each has its own","Only methods","Only if equal"],a:1,d:3,exp:"Each instance stores its own attribute values."},
+          {stem:"class C:\\n  x=0\\n  def __init__(s): s.x=5 — after c=C(), c.x is?",opts:["0","5","None","Error"],a:1,d:3,exp:"The instance attribute set in __init__ shadows the class attribute → 5."},
+          {stem:"Which method makes obj + obj work?",opts:["__str__","__add__","__init__","__plus__"],a:1,d:2,exp:"__add__ overloads the + operator."},
+          {stem:"Keyword to define a class?",opts:["def","class","object","new"],a:1,d:1,exp:"Use the class keyword."},
+          {stem:"The first parameter of an instance method is conventionally?",opts:["this","self","me","obj"],a:1,d:1,exp:"By convention it is self."},
+          {stem:"class P: def __init__(s,x): s.x=x — after p=P(7), p.x is?",opts:["0","7","None","Error"],a:1,d:2,exp:"__init__ stores 7 in the instance attribute."},
+          {stem:"A method is basically a?",opts:["Variable","Function defined inside a class","Loop","Module"],a:1,d:2,exp:"Methods are functions belonging to a class."},
+          {stem:"str(obj) calls the object's?",opts:["__init__","__str__","__len__","__add__"],a:1,d:2,exp:"__str__ provides the readable string."},
+          {stem:"a=P(1); b=P(1) — is 'a is b'?",opts:["True","False (different objects)","Error","Depends on x"],a:1,d:3,exp:"They are separate objects even with equal data."},
+          {stem:"Encapsulation mainly means?",opts:["Fast code","Bundling data + methods and hiding internals","Copying","Sorting"],a:1,d:3,exp:"Group related state and behavior behind an interface."}],
+    project:"Write a BankAccount class: balance + deposit/withdraw + __str__."},
+   {n:10,title:"Functions as Data (map/filter/reduce) · LAB EXAM",
+    topics:["Functions as args & returns","map / filter","functools.reduce","Final review"],
+    quiz:[{stem:"list(map(lambda x:x+1,[1,2,3])) = ?",opts:["[1,2,3]","[2,3,4]","[1,2,3,4]","[0,1,2]"],a:1,d:1,exp:"Each element +1."},
+          {stem:"What does filter do?",opts:["Transform each item","Keep items where the condition is true","Sort","Sum"],a:1,d:1,exp:"Keeps the elements for which the function returns True."},
+          {stem:"list(filter(lambda x:x%2==0,[1,2,3,4])) = ?",opts:["[1,3]","[2,4]","[1,2,3,4]","[]"],a:1,d:2,exp:"Keeps evens → [2,4]."},
+          {stem:"Can a function be passed as an argument to another function?",opts:["No","Yes — functions are objects","Only lambdas","Only built-ins"],a:1,d:2,exp:"In Python functions are first-class values."},
+          {stem:"reduce(lambda a,b:a+b,[1,2,3,4]) = ?",opts:["10","24","[1,2,3,4]","4"],a:0,d:3,exp:"Folds with +: ((1+2)+3)+4 = 10."},
+          {stem:"sum(map(lambda x:x*x,[1,2,3])) = ?",opts:["6","14","36","9"],a:1,d:3,exp:"Squares 1,4,9 then sum → 14."},
+          {stem:"list(map(str,[1,2])) = ?",opts:["['1','2']","[1,2]","'12'","[1.0,2.0]"],a:0,d:2,exp:"Converts each int to its string form."},
+          {stem:"map(f, seq) returns?",opts:["A list","A map object (iterator)","A dict","A set"],a:1,d:1,exp:"In Python 3 map is lazy; wrap it in list()."},
+          {stem:"A function that returns another function is a?",opts:["Loop","Higher-order function","Class","Module"],a:1,d:1,exp:"Functions that take/return functions are higher-order."},
+          {stem:"list(filter(None,[0,1,2,0])) = ?",opts:["[0,0]","[1,2]","[0,1,2,0]","[]"],a:1,d:2,exp:"filter(None,...) keeps truthy values → [1,2]."},
+          {stem:"sorted([3,1,2],key=lambda x:-x) = ?",opts:["[1,2,3]","[3,2,1]","[3,1,2]","[2,1,3]"],a:1,d:2,exp:"Negating the key sorts descending."},
+          {stem:"reduce lives in which module in Python 3?",opts:["builtins","functools","itertools","math"],a:1,d:3,exp:"reduce moved into functools in Python 3."},
+          {stem:"list(map(lambda x:x*10,[1,2,3])) = ?",opts:["[1,2,3]","[10,20,30]","[10]","30"],a:1,d:2,exp:"Each element ×10."},
+          {stem:"def make_adder(n): return lambda x:x+n — make_adder(5)(2) = ?",opts:["5","7","2","10"],a:1,d:3,exp:"The closure captures n=5, then 2+5=7."}],
+    project:"Combined: from a set of scores, use filter to select passing ones, map to letter grades, and sum to get the average."},
+   {n:11,title:"FINAL EXAM WEEK",
+    topics:["Comprehensive review: syntax → loops → functions → lists/dicts → classes → map/filter","Redo past exam questions","Exam time management"],
+    quiz:[{stem:"Best way to review for the final?",opts:["Only reread notes","Redo problems + rework your mistakes","Cram all-nighter before the exam","Skip weak topics"],a:1,d:1,exp:"Active practice plus reworking your mistake notebook is the most effective."},
+          {stem:"What does len('hello') return?",opts:["4","5","6","'hello'"],a:1,d:1,exp:"5 characters."},
+          {stem:"Which is TRUE about Python?",opts:["Indentation is optional","Indentation defines blocks","Semicolons are required","Types must be declared"],a:1,d:2,exp:"Python uses indentation instead of braces to define blocks."},
+          {stem:"nums=[3,1,2]; nums.sort() — nums becomes?",opts:["[3,1,2]","[1,2,3]","[3,2,1]","None"],a:1,d:3,exp:".sort() sorts in place ascending → [1,2,3]."},
+          {stem:"sorted([3,1,2],reverse=True) = ?",opts:["[1,2,3]","[3,2,1]","[3,1,2]","None"],a:1,d:2,exp:"Descending sort → [3,2,1]."},
+          {stem:"'ab'*3 = ?",opts:["'ababab'","'aaabbb'","'ab3'","Error"],a:0,d:3,exp:"String repetition with * → 'ababab'."},
+          {stem:"'abc'[0] = ?",opts:["'a'","'c'","'abc'","0"],a:0,d:1,exp:"Index 0 is the first character."},
+          {stem:"type([]) is?",opts:["dict","list","tuple","set"],a:1,d:1,exp:"[] is an empty list."},
+          {stem:"3 == 3.0 evaluates to?",opts:["True","False","Error","'3'"],a:0,d:2,exp:"Python compares the numeric value → True."},
+          {stem:"list(range(2,5)) = ?",opts:["[2,3,4]","[2,3,4,5]","[3,4,5]","[2,5]"],a:0,d:2,exp:"Stop is exclusive → [2,3,4]."},
+          {stem:"Best strategy for a hard exam question?",opts:["Freeze on it","Skip it, do easy ones, return later","Leave the exam","Guess randomly first"],a:1,d:2,exp:"Bank the easy points, then come back."},
+          {stem:"bool('') evaluates to?",opts:["True","False","''","Error"],a:1,d:3,exp:"An empty string is falsy → False."}],
+    project:"Redo every question in your mistake notebook until they are all correct."}
+  ]},
+
+ ics32:{ code:"ICS 32", name:"Programming with Software Libraries", term:"Winter", start:"2027-01-04",
+  exams:{10:"REVIEW",11:"FINAL EXAM"},
+  weeks:[
+   {n:1,title:"Libraries, Abstraction, Files & Exceptions",
+    topics:["Software libraries & abstraction","File systems & paths","Reading/writing files","try/except handling"],
+    quiz:[{stem:"After using open(f), you should?",opts:["It doesn't matter","close() it, or use with","Delete the file","Import it"],a:1,d:1,exp:"Use with to auto-close and avoid resource leaks."},
+          {stem:"Benefit of abstraction?",opts:["Longer code","Hides details, easier to reuse","Slower","Requires internet"],a:1,d:1,exp:"It hides implementation details and exposes only the interface."},
+          {stem:"open('data.txt','r') opens the file for?",opts:["Writing","Reading","Appending","Deleting"],a:1,d:2,exp:"'r' = read mode; 'w' write, 'a' append."},
+          {stem:"Opening a missing file for reading raises?",opts:["ValueError","FileNotFoundError","KeyError","StopIteration"],a:1,d:2,exp:"FileNotFoundError — often handled with try/except."},
+          {stem:"Why is 'with open(...) as f:' preferred?",opts:["It's shorter to type","It closes the file automatically even on error","It reads faster","It encrypts data"],a:1,d:3,exp:"The context manager guarantees close(), even if an exception happens."},
+          {stem:"with open('a.txt','w') as f: f.write('hi') — after the block, the file is?",opts:["Still open","Closed automatically","Deleted","Locked"],a:1,d:2,exp:"The with-block closes the file when it exits."},
+          {stem:"open('x','a') then write — existing content is?",opts:["Overwritten","Kept; new text appended to the end","Erased","Error"],a:1,d:3,exp:"'a' append mode preserves content and adds to the end."},
+          {stem:"Mode 'w' when opening a file does what to existing content?",opts:["Appends","Overwrites/truncates it","Keeps it","Errors"],a:1,d:1,exp:"'w' truncates the file to empty first."},
+          {stem:"An abstraction lets you use something without knowing its?",opts:["Name","Internal implementation","Location","Size"],a:1,d:1,exp:"You rely on the interface, not the details."},
+          {stem:"f.read() returns the content as?",opts:["A list","A single string","A dict","Bytes always"],a:1,d:2,exp:"read() gives the whole content as one str in text mode."},
+          {stem:"A relative path is interpreted relative to?",opts:["The C: drive","The current working directory","The home folder","The file size"],a:1,d:2,exp:"Relative paths resolve from the CWD."},
+          {stem:"In try/except/else, the else block runs when?",opts:["Always","No exception occurred","On error","Never"],a:1,d:3,exp:"else runs only if the try body raised nothing."},
+          {stem:"f.write(5) where 5 is an int raises?",opts:["Nothing","TypeError (needs str)","ValueError","IndexError"],a:1,d:3,exp:"write expects a string; convert with str()."},
+          {stem:"Reading a file twice without seek(0), the second read gives?",opts:["Same text","Empty string (cursor at end)","Error","Half"],a:1,d:2,exp:"The cursor is at EOF, so the second read is empty."}],
+    project:"Read a text file and count its lines, words, and characters (open it with with)."},
+   {n:2,title:"Testing, Recursion, Modules & import",
+    topics:["Testing & categories of test cases","Recursive data & functions","Multi-file programs","modules & import"],
+    quiz:[{stem:"A recursive function must have?",opts:["A loop","A base case","A global variable","A file"],a:1,d:1,exp:"Without a base case it recurses forever."},
+          {stem:"Good test cases should cover?",opts:["Only normal input","Normal + boundary + error","Only boundaries","No testing needed"],a:1,d:1,exp:"Test normal, boundary, and erroneous inputs."},
+          {stem:"def f(n): return 1 if n<=1 else n*f(n-1) — f(4)=?",opts:["10","24","4","12"],a:1,d:2,exp:"4*3*2*1 = 24 (factorial)."},
+          {stem:"Missing/too-deep recursion raises which error?",opts:["RecursionError","IndexError","NameError","IOError"],a:0,d:2,exp:"Too many nested calls → RecursionError (stack overflow)."},
+          {stem:"To use a function from file util.py, you?",opts:["Copy the file","import util (then util.func)","Rename it","Nothing needed"],a:1,d:3,exp:"import the module, then call module.function()."},
+          {stem:"def c(n): return 0 if n==0 else 1+c(n-1) — what is c(3)?",opts:["0","3","4","infinite"],a:1,d:3,exp:"Adds 1 three times before hitting the base case → 3."},
+          {stem:"from util import f  lets you write?",opts:["util.f()","f()","util()","import f"],a:1,d:2,exp:"It brings f directly into the current scope."},
+          {stem:"A base case in recursion is the case that?",opts:["Recurses more","Stops the recursion","Runs fastest","Imports"],a:1,d:1,exp:"It returns without recursing further."},
+          {stem:"A boundary test case checks?",opts:["Typical input","Edge values (empty, 0, max)","Only errors","Nothing"],a:1,d:1,exp:"Edges/limits often reveal bugs."},
+          {stem:"import math; math.sqrt(9) = ?",opts:["3.0","9","81","Error"],a:0,d:2,exp:"sqrt(9)=3.0."},
+          {stem:"def s(n): return 0 if n==0 else n+s(n-1) — s(3) = ?",opts:["3","6","0","9"],a:1,d:2,exp:"3+2+1+0 = 6."},
+          {stem:"if __name__=='__main__': guards code that?",opts:["Always runs","Runs only when the file is executed directly","Never runs","Imports faster"],a:1,d:3,exp:"It skips that block when the module is imported."},
+          {stem:"Recursion without a base case causes?",opts:["Fast result","RecursionError (stack overflow)","TypeError","Nothing"],a:1,d:2,exp:"It recurses until the stack limit is hit."},
+          {stem:"import util as u lets you call?",opts:["util.f()","u.f()","f()","import.f()"],a:1,d:3,exp:"The alias u replaces the module name."}],
+    project:"Write recursive factorial(n) and sum_list(lst), with 3 test cases each."},
+   {n:3,title:"Networks, Sockets, Clients & Protocols",
+    topics:["Computer networks overview","Sockets","Servers & clients","Custom text protocols"],
+    quiz:[{stem:"A socket is used for?",opts:["Drawing","Network communication between programs","Storing files","Doing math"],a:1,d:1,exp:"Sockets send and receive over the network."},
+          {stem:"In client-server, the server is responsible for?",opts:["Initiating requests","Listening for and responding to requests","Only showing the UI","Nothing"],a:1,d:1,exp:"The server listens and responds; the client initiates."},
+          {stem:"Which correctly orders a server's socket setup?",opts:["connect → send","bind → listen → accept","accept → bind","send → recv → bind"],a:1,d:2,exp:"Server: bind an address, listen, then accept connections."},
+          {stem:"Data sent over a socket is transferred as?",opts:["Python objects","Bytes","A dict","A file handle"],a:1,d:2,exp:"Sockets send raw bytes; encode/decode strings."},
+          {stem:"A 'protocol' in networking is?",opts:["A cable","An agreed set of message rules both sides follow","A password","A GUI"],a:1,d:3,exp:"It's the shared format/rules so client and server understand each other."},
+          {stem:"To send the string 'hi' over a socket you first?",opts:["encode() it to bytes","json.dumps it","print it","sort it"],a:0,d:3,exp:"Sockets transmit bytes, so encode() the string first."},
+          {stem:"Which side calls connect()?",opts:["Server","Client","Both","Neither"],a:1,d:2,exp:"The client connects to the server's listening socket."},
+          {stem:"A client typically does what first?",opts:["listen()","connect() to a server","accept()","bind() a port"],a:1,d:1,exp:"The client connects to the server."},
+          {stem:"An IP address identifies a?",opts:["File","Machine on a network","Function","Variable"],a:1,d:1,exp:"It addresses a host on the network."},
+          {stem:"To turn received bytes into text you?",opts:["encode()","decode()","sort()","open()"],a:1,d:2,exp:"decode() converts bytes → str."},
+          {stem:"A port number lets one machine run?",opts:["Only one service","Many services distinguished by port","A faster CPU","More RAM"],a:1,d:2,exp:"Ports separate different services on the same host."},
+          {stem:"recv(1024) returns?",opts:["Exactly 1024 bytes always","Up to 1024 bytes","A file","A dict"],a:1,d:3,exp:"It reads at most that many bytes, possibly fewer."},
+          {stem:"TCP provides delivery that is?",opts:["Unreliable","Reliable and ordered","Random","Encrypted"],a:1,d:2,exp:"TCP guarantees ordered, reliable byte streams."},
+          {stem:"Client and server must agree on the ___ to understand each other.",opts:["Font","Protocol","Editor","OS"],a:1,d:3,exp:"A shared protocol defines the message format."}],
+    project:"Use sockets to write an echo client: connect to a server, send a line, and print the reply."},
+   {n:4,title:"Classes, Objects, Duck Typing & Interfaces",
+    topics:["Classes, attributes, constructors","Methods","Duck typing","Designing consistent classes"],
+    quiz:[{stem:"What does duck typing mean?",opts:["Inheritance is required","Judge by what it can do, not its type","Only use int","No methods allowed"],a:1,d:1,exp:"'If it quacks like a duck...' — judge by behavior, not by type."},
+          {stem:"The constructor in Python is?",opts:["__str__","__init__","__main__","__len__"],a:1,d:1,exp:"__init__ is the constructor."},
+          {stem:"An 'interface' is best described as?",opts:["A cable","A set of methods a class promises to provide","A variable","A loop"],a:1,d:2,exp:"It's the agreed set of methods callers can rely on."},
+          {stem:"Two classes both have .area(); code calling shape.area() works because?",opts:["They inherit from int","Duck typing — same method name/behavior","They are equal","It's random"],a:1,d:2,exp:"Only the behavior matters, not a shared base class."},
+          {stem:"Why prefer many small consistent classes over one huge class?",opts:["Runs faster always","Easier to test, reuse, and reason about","Uses less disk","Required by Python"],a:1,d:3,exp:"Separation of responsibilities improves maintainability and testing."},
+          {stem:"len(obj) works only if the class defines?",opts:["__len__","__size__","length()","count"],a:0,d:3,exp:"len() calls the object's __len__ method."},
+          {stem:"Duck typing lets a function accept?",opts:["Only one class","Any object that has the needed methods","Only built-ins","Only subclasses"],a:1,d:2,exp:"If it has the right methods it works, regardless of class."},
+          {stem:"An attribute set in __init__ belongs to?",opts:["The class only","The specific instance","All modules","The function"],a:1,d:1,exp:"self.x makes it an instance attribute."},
+          {stem:"Duck typing focuses on an object's?",opts:["Exact class","Behavior/methods","Memory size","Name"],a:1,d:1,exp:"If it behaves right, use it."},
+          {stem:"Two unrelated classes with a .draw() method both work in a function calling draw() because of?",opts:["Inheritance","Duck typing","Recursion","Globals"],a:1,d:2,exp:"Only the method's presence matters."},
+          {stem:"An interface is a promise about which?",opts:["Speed","Set of methods available","Colors","File size"],a:1,d:2,exp:"It specifies the callable methods."},
+          {stem:"str(obj) with no __str__ falls back to?",opts:["Error","A default like <Class object at ...>","Empty","The __init__"],a:1,d:3,exp:"Without __str__/__repr__ you get the default representation."},
+          {stem:"Instance methods receive the instance via?",opts:["A global","The first parameter (self)","Return value","Import"],a:1,d:2,exp:"self is passed automatically."},
+          {stem:"Designing consistent classes means giving similar things?",opts:["Random methods","The same method names/behavior","Different names","No methods"],a:1,d:3,exp:"Consistent interfaces let them be used interchangeably."}],
+    project:"Design a Shape interface plus Circle/Rectangle classes that both implement area()."},
+   {n:5,title:"Web: URLs, HTTP, Web APIs & JSON",
+    topics:["URLs & HTTP requests","Web APIs","JSON parsing","Accessing web services (stdlib)"],
+    quiz:[{stem:"After parsing, JSON in Python is usually?",opts:["A string","A dict/list","An integer","A file"],a:1,d:1,exp:"A JSON object → dict, a JSON array → list."},
+          {stem:"HTTP GET is generally used to?",opts:["Delete data","Fetch data","Shut down","Compile"],a:1,d:1,exp:"GET retrieves data."},
+          {stem:"Which function turns a JSON string into a Python object?",opts:["json.dumps","json.loads","json.read","str()"],a:1,d:2,exp:"loads = load string → object; dumps = object → string."},
+          {stem:"An HTTP status code of 404 means?",opts:["Success","Not Found","Server error","Redirect"],a:1,d:2,exp:"404 = the requested resource wasn't found."},
+          {stem:"data={'user':{'name':'Al'}}; data['user']['name'] = ?",opts:["'Al'","{'name':'Al'}","Error","user"],a:0,d:3,exp:"Parsed JSON is nested dicts; drill in by keys."},
+          {stem:"json.dumps({'a':1}) returns?",opts:["a dict","a JSON-formatted string","the number 1","an error"],a:1,d:3,exp:"dumps serializes a Python object into a JSON string."},
+          {stem:"An HTTP 200 status means?",opts:["Not Found","OK / success","Server error","Redirect"],a:1,d:2,exp:"200 = the request succeeded."},
+          {stem:"A URL's scheme is the part like?",opts:["/path","https://","?query","#frag"],a:1,d:1,exp:"http/https is the scheme."},
+          {stem:"JSON stands for?",opts:["Java Sorted Object Names","JavaScript Object Notation","Just Some Old Numbers","Joined Set Of Nodes"],a:1,d:1,exp:"JavaScript Object Notation."},
+          {stem:"json.loads('[1,2,3]') gives a?",opts:["str","list","dict","tuple"],a:1,d:2,exp:"A JSON array parses to a Python list."},
+          {stem:"HTTP 500 status means?",opts:["OK","Not Found","Server error","Redirect"],a:2,d:2,exp:"5xx codes are server errors."},
+          {stem:"JSON's null parses to which Python value?",opts:["0","None","''","False"],a:1,d:3,exp:"JSON null maps to Python None."},
+          {stem:"A Web API commonly returns data in which format?",opts:["PDF","JSON","MP3","EXE"],a:1,d:2,exp:"JSON is the common API data format."},
+          {stem:"json.dumps converts a Python dict to a?",opts:["list","JSON string","file","set"],a:1,d:3,exp:"dumps serializes to a JSON-formatted string."}],
+    project:"Call a public JSON API (e.g. weather), parse it, and print 3 of its fields."},
+   {n:6,title:"References, TDD, Refactoring & unittest",
+    topics:["Object references","Multidimensional data","Test-driven development","unittest module"],
+    quiz:[{stem:"The order of TDD?",opts:["Write code first, then tests","Write tests first, then code","Don't write tests","Only write docs"],a:1,d:1,exp:"Tests first: red - green - refactor."},
+          {stem:"Two variables point to the same list; changing one will?",opts:["Not affect the other","Change both (same object)","Raise an error","Make a copy"],a:1,d:1,exp:"They reference the same object, so both change."},
+          {stem:"To make an independent copy of a list, use?",opts:["b=a","b=a.copy() or a[:]","b==a","b=a*1"],a:1,d:2,exp:"copy() or a full slice makes a new list."},
+          {stem:"'Refactoring' means?",opts:["Adding features","Improving code structure without changing behavior","Deleting tests","Renaming the file"],a:1,d:2,exp:"Same behavior, cleaner internal design."},
+          {stem:"In unittest, self.assertEqual(f(2),4) fails when?",opts:["f(2)==4","f(2)!=4","Always","Never"],a:1,d:3,exp:"assertEqual fails if the two values differ."},
+          {stem:"a=[1,2]; b=a[:]; b.append(3) — what is a now?",opts:["[1,2,3]","[1,2]","[3]","Error"],a:1,d:3,exp:"a[:] made a copy, so appending to b leaves a unchanged."},
+          {stem:"In TDD, writing a test that fails first is the?",opts:["Green step","Red step","Refactor step","Skip step"],a:1,d:2,exp:"Red (fail) → Green (pass) → Refactor."},
+          {stem:"a=[1]; b=a — a and b refer to?",opts:["Two lists","The same list","Copies","Nothing"],a:1,d:1,exp:"Assignment copies the reference, not the list."},
+          {stem:"TDD's cycle is?",opts:["Code-Test-Ship","Red-Green-Refactor","Plan-Do-Sleep","Import-Run"],a:1,d:1,exp:"Fail, pass, then clean up."},
+          {stem:"To copy a list independently use?",opts:["b=a","b=list(a)","b is a","b==a"],a:1,d:2,exp:"list(a) (or a[:]) makes a new list."},
+          {stem:"unittest test methods must start with?",opts:["check_","test_","run_","do_"],a:1,d:2,exp:"The runner discovers methods named test_*."},
+          {stem:"Refactoring should keep the ___ the same.",opts:["File name","External behavior","Variable names","Comments"],a:1,d:3,exp:"Only internal structure improves; behavior is unchanged."},
+          {stem:"self.assertTrue(x) passes when x is?",opts:["False","Truthy","None","0"],a:1,d:2,exp:"It passes if x evaluates truthy."},
+          {stem:"A 2D list grid[1][2] accesses?",opts:["Row 2 col 1","Row 1 col 2","Column only","Error"],a:1,d:3,exp:"First index is the row, second the column."}],
+    project:"Use unittest to write a test class for is_prime and pass all cases."},
+   {n:7,title:"Third-party Libs, venv & PyGame Basics",
+    topics:["Third-party libraries & pip","Virtual environments","PyGame: game loop, display","Events & model/view"],
+    quiz:[{stem:"A virtual environment (venv) solves?",opts:["Network speed","Per-project dependency isolation","The monitor","Fonts"],a:1,d:1,exp:"Each project gets its own dependencies with no conflicts."},
+          {stem:"A game loop does what each frame?",opts:["Draw only once","Handle input → update → redraw","Close the program","Read a file"],a:1,d:1,exp:"The input-update-render loop."},
+          {stem:"Which command installs a third-party library?",opts:["python run","pip install name","import name","get name"],a:1,d:2,exp:"pip installs packages from PyPI."},
+          {stem:"In PyGame, why call the update/redraw every frame?",opts:["To save power","To show motion/animation smoothly","To close faster","It's optional junk"],a:1,d:2,exp:"Redrawing each frame produces animation."},
+          {stem:"Model/View: the 'model' should hold?",opts:["Drawing code","The game state/data","Button colors","Fonts"],a:1,d:3,exp:"Model = data/logic; View = how it's displayed."},
+          {stem:"pip freeze is used to?",opts:["Stop the program","List installed packages and versions","Delete the venv","Draw graphics"],a:1,d:2,exp:"It lists installed packages, often saved to requirements.txt."},
+          {stem:"A moving object's position should be stored in the?",opts:["View","Model","Font","Window title"],a:1,d:3,exp:"State such as position belongs in the model."},
+          {stem:"PyPI is?",opts:["A game","The Python Package Index","A file type","An error"],a:1,d:1,exp:"pip installs packages from PyPI."},
+          {stem:"A venv keeps each project's ___ separate.",opts:["Fonts","Dependencies","Monitors","Users"],a:1,d:1,exp:"Isolated dependencies avoid version conflicts."},
+          {stem:"The three phases repeated in a game loop are?",opts:["Open-Read-Close","Input-Update-Render","Bind-Listen-Accept","Try-Except-Finally"],a:1,d:2,exp:"Handle input, update state, then draw."},
+          {stem:"To use a venv you first?",opts:["Delete it","Activate it","Compile it","Import it"],a:1,d:2,exp:"Activating puts its Python/packages on your path."},
+          {stem:"In model/view, drawing code belongs in the?",opts:["Model","View","venv","Socket"],a:1,d:3,exp:"The view renders; the model holds data."},
+          {stem:"pip install requests fetches the package from?",opts:["Your disk","PyPI (the internet)","The venv","GitHub only"],a:1,d:2,exp:"pip downloads from PyPI by default."},
+          {stem:"To record dependencies for reproducibility, you save?",opts:["a .png","requirements.txt","a .exe","the venv folder"],a:1,d:3,exp:"pip freeze > requirements.txt records versions."}],
+    project:"PyGame: open a window and draw a square that moves with the arrow keys."},
+   {n:8,title:"Game Enhancements, Sound & tkinter GUIs",
+    topics:["Keyboard input handling","Sound & mixers","tkinter widgets","Event-based programming"],
+    quiz:[{stem:"What mainly drives a GUI program?",opts:["for loops","Events","Files","Recursion"],a:1,d:1,exp:"Event-driven: clicks/keys trigger callbacks."},
+          {stem:"In tkinter, a Button is a?",opts:["Widget","File","Protocol","Exception"],a:0,d:1,exp:"A button is a kind of widget."},
+          {stem:"A 'callback' function is one that?",opts:["Calls itself","Runs when an event happens","Reads a file","Never runs"],a:1,d:2,exp:"You register it, and the toolkit calls it on the event."},
+          {stem:"tkinter's mainloop() does what?",opts:["Draws once and exits","Waits for and dispatches events","Reads input()","Sleeps"],a:1,d:2,exp:"It keeps the window alive, processing events."},
+          {stem:"Why keep sound/graphics code out of the game logic?",opts:["Looks nicer","Separation makes logic testable without a screen","Runs faster","No reason"],a:1,d:3,exp:"Decoupling I/O from logic makes the logic unit-testable."},
+          {stem:"Button(root,text='Go',command=run) — when does run execute?",opts:["Immediately","When the button is clicked","Never","At import time"],a:1,d:3,exp:"command holds the function object; it runs on click."},
+          {stem:"Which starts the tkinter event loop?",opts:["root.start()","root.mainloop()","root.run()","loop()"],a:1,d:2,exp:"mainloop() processes events until the window closes."},
+          {stem:"An event in a GUI is something like?",opts:["A for loop","A click or keypress","A file read","An import"],a:1,d:1,exp:"User actions generate events."},
+          {stem:"A tkinter Label is used to?",opts:["Play sound","Display text/images","Open files","Network"],a:1,d:1,exp:"Labels show static text or images."},
+          {stem:"You attach behavior to a Button using the ___ parameter.",opts:["text","command","color","font"],a:1,d:2,exp:"command holds the callback to run on click."},
+          {stem:"mainloop() is called?",opts:["Once, at the end","In every callback","Never","Before widgets"],a:0,d:2,exp:"Call it once to start processing events."},
+          {stem:"Why register a callback instead of running code immediately?",opts:["It's faster","So it runs later when the event fires","Saves disk","No reason"],a:1,d:3,exp:"Event-driven code responds when the event happens."},
+          {stem:"A widget must be added to the window with a ___ manager.",opts:["import","layout (pack/grid)","socket","try"],a:1,d:2,exp:"pack/grid/place position widgets."},
+          {stem:"Keeping game logic separate from sound makes the logic?",opts:["Slower","Testable without hardware","Louder","Bigger"],a:1,d:3,exp:"Decoupling I/O lets you unit-test the logic."}],
+    project:"tkinter: build a window with a text box + button; clicking the button shows the input in a label."},
+   {n:9,title:"Bound Methods, grid Layout & Model/View",
+    topics:["Bound methods","grid layout manager","Model/view separation","TDD on real projects"],
+    quiz:[{stem:"Benefit of Model/View separation?",opts:["Looks nicer","Decouples logic from the UI, easier to test","Faster","Saves memory"],a:1,d:1,exp:"Data logic is independent of the UI, easier to test and maintain."},
+          {stem:"grid() is used to?",opts:["Network","Place widgets by row/column","Read files","Encrypt"],a:1,d:1,exp:"It's the grid layout manager."},
+          {stem:"A 'bound method' is?",opts:["A frozen variable","A method already tied to a specific object","A loop","A file"],a:1,d:2,exp:"obj.method is bound to obj, so self is supplied automatically."},
+          {stem:"widget.grid(row=0,column=1) places it?",opts:["Row 1, col 0","Row 0, col 1","Anywhere","Off-screen"],a:1,d:2,exp:"Row and column are explicit; counting starts at 0."},
+          {stem:"Passing self.update as a button command (no par()) means?",opts:["Call it now","Give the function to call later on click","Syntax error","Run twice"],a:1,d:3,exp:"You pass the function object; the toolkit calls it on the event."},
+          {stem:"obj.method (without parentheses) evaluates to a?",opts:["Return value","Bound method object","String","Class"],a:1,d:3,exp:"You get a bound method you can store or pass to call later."},
+          {stem:"grid(row=1,column=0) vs grid(row=0,column=1) differ how?",opts:["Same cell","Different row/column position","Both invalid","Random"],a:1,d:2,exp:"Row/column coordinates place the widget in different cells."},
+          {stem:"grid(row=2,column=3) places a widget at?",opts:["Row 3 col 2","Row 2 col 3","Center","Random"],a:1,d:1,exp:"Row 2, column 3 (0-indexed)."},
+          {stem:"obj.method is called a ___ method.",opts:["static","bound","free","lambda"],a:1,d:1,exp:"It is bound to obj, supplying self automatically."},
+          {stem:"Passing obj.update (no parentheses) passes the?",opts:["Return value","Function to call later","A string","None"],a:1,d:2,exp:"You pass the callable itself."},
+          {stem:"grid arranges widgets by?",opts:["Order added","Rows and columns","Color","Size"],a:1,d:2,exp:"grid uses a table of rows/columns."},
+          {stem:"In model/view, tests should target the?",opts:["View pixels","Model logic","Fonts","Window title"],a:1,d:3,exp:"Testing the model avoids needing a display."},
+          {stem:"A bound method already knows its?",opts:["Return value","self (the object)","Module","File"],a:1,d:2,exp:"self is fixed to the specific instance."},
+          {stem:"columnspan=2 in grid makes a widget?",opts:["Twice as tall","Span two columns","Invisible","Move rows"],a:1,d:3,exp:"It stretches the widget across two columns."}],
+    project:"Use grid to build a simple calculator UI (number buttons + a display box)."},
+   {n:10,title:"Review Week",
+    topics:["Full-quarter comprehensive review","Wrap up projects","No new material"],
+    quiz:[{stem:"What should you focus on most in review week?",opts:["Start a new project","Consolidate + add tests + rework mistakes","Don't study","Only sleep"],a:1,d:1,exp:"Consolidate what you learned, fill in tests, and go through your mistakes."},
+          {stem:"Which module runs unit tests?",opts:["random","unittest","socket","json"],a:1,d:2,exp:"unittest is the standard testing framework."},
+          {stem:"Best way to prove a refactor didn't break anything?",opts:["Hope","Run the existing test suite","Delete tests","Rename functions"],a:1,d:3,exp:"Passing tests confirm behavior is unchanged."},
+          {stem:"assertRaises is used to check that code?",opts:["Returns a value","Raises a specific exception","Runs fast","Prints output"],a:1,d:3,exp:"It verifies the expected exception is raised."},
+          {stem:"The best review activity is to?",opts:["Reread passively","Redo problems and fix mistakes","Skip topics","Watch videos only"],a:1,d:1,exp:"Active recall/practice beats passive review."},
+          {stem:"A test that still passes after refactoring shows?",opts:["The refactor broke it","Behavior is preserved","Nothing","It's slow"],a:1,d:2,exp:"Green tests confirm unchanged behavior."},
+          {stem:"self.assertEqual(a,b) checks that?",opts:["a is b","a equals b","a>b","a is None"],a:1,d:2,exp:"It asserts the two values are equal."},
+          {stem:"Organizing your notes by ___ helps final prep.",opts:["Color only","Topic and common patterns","Font","Length"],a:1,d:3,exp:"Grouping by topic/pattern aids recall."},
+          {stem:"self.assertTrue(x) passes when x is?",opts:["False","Truthy","None","Zero"],a:1,d:2,exp:"It passes when the value is truthy."},
+          {stem:"A good unit test is?",opts:["Long and vague","Focused, repeatable, and checks one behavior","Random","Never run"],a:1,d:2,exp:"Small deterministic tests pinpoint failures."},
+          {stem:"A clear failure message helps you?",opts:["Hide the bug","Locate what went wrong quickly","Skip it","Delete code"],a:1,d:1,exp:"Good messages speed up debugging."},
+          {stem:"Running tests before and after a change is called?",opts:["Guessing","Regression testing","Encrypting","Profiling"],a:1,d:3,exp:"It confirms old behavior still holds after a change."},
+          {stem:"When reviewing, spend the most time on?",opts:["Topics you already know","Your weakest topics and past mistakes","Only easy items","Nothing"],a:1,d:2,exp:"Target your weak spots and error notebook."},
+          {stem:"setUp() in a TestCase runs?",opts:["Once ever","Before each test method","Never","After all tests"],a:1,d:3,exp:"setUp runs before every test to prepare fixtures."}],
+    project:"Add complete unittest tests to one of this quarter's projects."},
+   {n:11,title:"FINAL EXAM WEEK",
+    topics:["Comprehensive review: files/exceptions → networks → classes/interfaces → Web/JSON → GUI","Go through all the Notes","Hands-on lab practice"],
+    quiz:[{stem:"Best prep before a lab exam?",opts:["Only read, don't write","Type out the common patterns by hand","Memorize code","Skip it"],a:1,d:1,exp:"Fluency comes from typing it yourself."},
+          {stem:"Reading a file line by line, best pattern?",opts:["for line in f:","while True: f.read()","f.close() first","import f"],a:0,d:2,exp:"Iterating the file object yields lines efficiently."},
+          {stem:"A robust program handling bad input should?",opts:["Crash","Catch exceptions and message the user","Ignore input","Loop forever"],a:1,d:3,exp:"Validate/try-except at the boundary and give clear feedback."},
+          {stem:"Catching a broad 'except Exception' everywhere is?",opts:["Best practice","Often bad — it can hide real bugs","Required","Faster"],a:1,d:3,exp:"Prefer specific exceptions; broad catches can mask errors."},
+          {stem:"To read all lines of a file into a list, use?",opts:["f.readlines()","f.read(1)","f.close()","list(f.name)"],a:0,d:2,exp:"readlines() returns a list of the file's lines."},
+          {stem:"with open('f') as f: guarantees the file is?",opts:["Encrypted","Closed after the block","Deleted","Read twice"],a:1,d:1,exp:"The context manager closes it automatically."},
+          {stem:"JSON parsed into Python gives dicts and?",opts:["sets","lists","tuples","files"],a:1,d:2,exp:"Objects → dicts, arrays → lists."},
+          {stem:"Catching a specific exception is better than a broad one because it?",opts:["Runs faster","Avoids hiding unrelated bugs","Uses less RAM","Looks nicer"],a:1,d:3,exp:"A broad except can mask real errors."},
+          {stem:"In a client-server echo program, the server?",opts:["connect()s","listens and replies","draws UI","sorts data"],a:1,d:2,exp:"The server listens, accepts, and responds."},
+          {stem:"To build exam fluency, best practice is?",opts:["Read solutions","Rewrite a project under a time limit","Skip typing","Memorize"],a:1,d:3,exp:"Timed hands-on practice builds fluency."},
+          {stem:"json.dumps() converts a Python object to?",opts:["A file","A JSON string","A list","Bytes only"],a:1,d:2,exp:"dumps serializes an object into a JSON-formatted string."},
+          {stem:"A tkinter button runs your code through its?",opts:["value","command callback","title","color"],a:1,d:2,exp:"command= binds the function called on click."}],
+    project:"Rewrite an earlier project under a time limit to test your fluency."}
+  ]},
+
+ ics33:{ code:"ICS 33", name:"Intermediate Programming", term:"Spring", start:"2027-03-29",
+  exams:{11:"FINAL EXAM"},
+  weeks:[
+   {n:1,title:"Python Review: Dicts, Scopes, Classes, Params",
+    topics:["Dicts & namespaces","Scopes & module import","Classes, objects, methods","Function parameter conventions"],
+    quiz:[{stem:"*args means?",opts:["One argument","Any number of positional arguments","Keyword arguments","A return value"],a:1,d:1,exp:"*args collects any number of positional arguments into a tuple."},
+          {stem:"A local variable's scope is?",opts:["The whole program","Inside the function that defines it","All files","Outside the class"],a:1,d:1,exp:"Local scope is limited to inside the function."},
+          {stem:"**kwargs collects arguments into a?",opts:["list","tuple","dict","set"],a:2,d:2,exp:"Keyword arguments arrive as a dict of name→value."},
+          {stem:"LEGB rule describes?",opts:["Loop order","Name lookup: Local, Enclosing, Global, Built-in","File imports","Class size"],a:1,d:2,exp:"Python resolves names in LEGB order."},
+          {stem:"def f(): x=x+1 with global x=5 raises?",opts:["Nothing","UnboundLocalError (x treated as local)","TypeError","5"],a:1,d:3,exp:"Assigning x makes it local, so reading it first fails unless you declare global x."},
+          {stem:"def f(a,b,*c): f(1,2,3,4) — what is c?",opts:["(3,4)","[3,4]","3","(1,2,3,4)"],a:0,d:3,exp:"*c collects the extra positionals into the tuple (3,4)."},
+          {stem:"To rebind a module-level variable inside a function you need?",opts:["nonlocal","global x","nothing","local x"],a:1,d:2,exp:"Declare 'global x' to assign to the module-level name."},
+          {stem:"**kwargs inside a function is a?",opts:["list","tuple","dict","set"],a:2,d:1,exp:"Keyword args collect into a dict."},
+          {stem:"A name defined at module top-level has ___ scope.",opts:["local","global (module)","class","builtin"],a:1,d:1,exp:"It is global to that module."},
+          {stem:"def f(a,b=5,*c): f(1) — b is?",opts:["0","5","1","None"],a:1,d:2,exp:"b uses its default 5."},
+          {stem:"The 'B' in LEGB stands for?",opts:["Block","Built-in","Boolean","Base"],a:1,d:2,exp:"Local, Enclosing, Global, Built-in."},
+          {stem:"def f(**k): return k — f(a=1,b=2) = ?",opts:["[1,2]","{'a':1,'b':2}","(1,2)","1"],a:1,d:3,exp:"kwargs are collected into a dict."},
+          {stem:"To only read (not rebind) a global inside a function you?",opts:["Need global","Can just read it","Need nonlocal","Cannot"],a:1,d:2,exp:"Reading is fine; only assignment needs global."},
+          {stem:"f(*[1,2,3]) does what?",opts:["Passes a list","Unpacks it as 3 arguments","Errors","Passes a tuple"],a:1,d:3,exp:"* unpacks the iterable into positional args."}],
+    project:"Write a function that uses *args and **kwargs to print all the arguments passed in."},
+   {n:2,title:"Context Managers & Complexity Analysis",
+    topics:["Context managers & with","Asymptotic analysis","Big-O notation","Measuring time/memory"],
+    quiz:[{stem:"Iterating a list of length n is?",opts:["O(1)","O(n)","O(n^2)","O(log n)"],a:1,d:1,exp:"One linear pass → O(n)."},
+          {stem:"The with statement guarantees?",opts:["Faster code","Automatic resource management on enter/exit","Networking","Encryption"],a:1,d:1,exp:"It cleans up automatically on exit (e.g. closes the file)."},
+          {stem:"A nested loop over n items (both) is typically?",opts:["O(n)","O(n^2)","O(log n)","O(1)"],a:1,d:2,exp:"n × n comparisons → O(n^2)."},
+          {stem:"Which grows slowest as n→∞?",opts:["O(n)","O(log n)","O(n log n)","O(n^2)"],a:1,d:2,exp:"Logarithmic growth is the slowest here."},
+          {stem:"A context manager needs which two methods?",opts:["open/close","__enter__/__exit__","start/stop","init/del"],a:1,d:3,exp:"__enter__ runs at 'with', __exit__ on leaving the block."},
+          {stem:"If each step doubles the work (1,2,4,8,...,n), total work is?",opts:["O(n)","O(log n)","O(n²)","O(1)"],a:0,d:3,exp:"1+2+4+...+n ≈ 2n → O(n) total (geometric series)."},
+          {stem:"list.append() has what amortized time complexity?",opts:["O(n)","O(log n)","O(1) amortized","O(n²)"],a:2,d:2,exp:"Occasional resizes average out to constant time per append."},
+          {stem:"O(1) means the time is?",opts:["Linear","Constant, independent of n","Quadratic","Logarithmic"],a:1,d:1,exp:"Constant time regardless of input size."},
+          {stem:"'with' calls which method on entry?",opts:["__exit__","__enter__","__init__","__call__"],a:1,d:1,exp:"__enter__ runs when the block begins."},
+          {stem:"Doubling n roughly doubles the time → complexity is?",opts:["O(1)","O(n)","O(n²)","O(log n)"],a:1,d:2,exp:"Linear scaling → O(n)."},
+          {stem:"Which is faster for large n: O(n log n) or O(n²)?",opts:["O(n²)","O(n log n)","Same","Depends on color"],a:1,d:2,exp:"n log n grows slower than n²."},
+          {stem:"__exit__ can suppress an exception by returning?",opts:["None","True","False","0"],a:1,d:3,exp:"Returning True from __exit__ swallows the exception."},
+          {stem:"Big-O describes the ___ behavior.",opts:["Exact","Asymptotic (large-n) growth","Memory only","Best-case only"],a:1,d:2,exp:"It characterizes growth as n→∞."},
+          {stem:"Two separate (not nested) loops over n are together?",opts:["O(n²)","O(2n) = O(n)","O(log n)","O(1)"],a:1,d:3,exp:"Sequential loops add: 2n → O(n)."}],
+    project:"Write your own context manager (using __enter__/__exit__) to time a block of code."},
+   {n:3,title:"Search Algorithms & Relational Databases",
+    topics:["Sequential vs binary search","Case analysis","Relational DB: tables, keys","Relationships"],
+    quiz:[{stem:"Binary search requires the data to be?",opts:["Random","Sorted","Very large","Strings"],a:1,d:1,exp:"Binary search requires sorted data."},
+          {stem:"Worst-case binary search on n elements?",opts:["O(n)","O(log n)","O(1)","O(n^2)"],a:1,d:1,exp:"It halves each time → O(log n)."},
+          {stem:"Sequential search worst case on n elements?",opts:["O(1)","O(log n)","O(n)","O(n^2)"],a:2,d:2,exp:"May check every element → O(n)."},
+          {stem:"A PRIMARY KEY in a relational table must be?",opts:["Text","Unique per row","Numeric","Optional"],a:1,d:2,exp:"It uniquely identifies each row."},
+          {stem:"Binary search on 1000 sorted items needs about how many steps?",opts:["1000","~10","~100","500"],a:1,d:3,exp:"log2(1000) ≈ 10 halvings."},
+          {stem:"A FOREIGN KEY in a relational table does what?",opts:["Speeds up the disk","Links a column to another table's primary key","Encrypts data","Sorts rows"],a:1,d:2,exp:"It enforces a relationship/reference to another table's key."},
+          {stem:"Binary search on 1,000,000 sorted items needs about how many steps?",opts:["~1000","~20","~500","1,000,000"],a:1,d:3,exp:"log2(1,000,000) ≈ 20 halvings."},
+          {stem:"Linear search works on data that is?",opts:["Only sorted","Sorted or unsorted","Only numeric","Only small"],a:1,d:1,exp:"It scans each element; order doesn't matter."},
+          {stem:"A primary key must be unique and?",opts:["Text","Non-null","Encrypted","Sorted"],a:1,d:1,exp:"It uniquely identifies each row (non-null)."},
+          {stem:"Best case of binary search (target is the middle)?",opts:["O(n)","O(1)","O(log n)","O(n²)"],a:1,d:2,exp:"Found on the first probe → O(1)."},
+          {stem:"A table's rows are also called?",opts:["Columns","Records","Keys","Indexes"],a:1,d:2,exp:"Each row is a record."},
+          {stem:"Binary search on 16 sorted items: max probes ≈?",opts:["16","4","8","2"],a:1,d:3,exp:"log2(16)=4."},
+          {stem:"A foreign key references another table's?",opts:["Row count","Primary key","Column width","File"],a:1,d:2,exp:"It links to the referenced primary key."},
+          {stem:"If the data is unsorted, binary search will?",opts:["Still work","Give wrong results","Be faster","Sort it first"],a:1,d:3,exp:"It requires sorted input; otherwise results are invalid."}],
+    project:"Implement binary_search(sorted_list, target), returning the index or -1."},
+   {n:4,title:"SQL & Mechanics of Iteration",
+    topics:["Creating tables in SQL","Data manipulation (INSERT/SELECT)","Mechanics of iteration","Comprehensions"],
+    quiz:[{stem:"SQL fetches data with?",opts:["GET","SELECT","PRINT","READ"],a:1,d:1,exp:"SELECT queries data."},
+          {stem:"{k:v for ...} is a?",opts:["Set comprehension","Dict comprehension","List","Tuple"],a:1,d:1,exp:"It's a dict comprehension."},
+          {stem:"Which SQL clause filters rows?",opts:["ORDER BY","WHERE","INSERT","GROUP"],a:1,d:2,exp:"WHERE restricts which rows are returned."},
+          {stem:"{x for x in range(5)} produces a?",opts:["list","set","dict","tuple"],a:1,d:2,exp:"Curly braces without k:v build a set."},
+          {stem:"INSERT INTO t VALUES(1,'a') does what?",opts:["Reads a row","Adds a new row","Deletes t","Creates t"],a:1,d:3,exp:"INSERT adds rows to an existing table."},
+          {stem:"Which SQL clause sorts the results?",opts:["WHERE","ORDER BY","GROUP BY","HAVING"],a:1,d:2,exp:"ORDER BY sorts the returned rows."},
+          {stem:"{x:x*x for x in range(3)} produces?",opts:["{0:0,1:1,2:4}","[0,1,4]","{0,1,4}","(0,1,4)"],a:0,d:3,exp:"A dict comprehension mapping each x to x²."},
+          {stem:"SELECT * means?",opts:["Delete all","All columns","Count rows","Sort"],a:1,d:1,exp:"* selects every column."},
+          {stem:"{x*2 for x in range(3)} is a ___ comprehension.",opts:["list","set","dict","tuple"],a:1,d:1,exp:"Braces without k:v build a set."},
+          {stem:"WHERE age > 18 does what?",opts:["Sorts","Filters rows","Adds a column","Deletes"],a:1,d:2,exp:"It restricts returned rows by a condition."},
+          {stem:"A comprehension is generally ___ than a loop+append.",opts:["Slower","More concise (often faster)","Buggier","Longer"],a:1,d:2,exp:"Comprehensions are concise and typically efficient."},
+          {stem:"DELETE FROM t WHERE id=1 does?",opts:["Drops the table","Removes matching rows","Adds a row","Selects"],a:1,d:3,exp:"It deletes rows meeting the condition."},
+          {stem:"COUNT(*) returns?",opts:["Column names","The number of rows","The first row","NULL"],a:1,d:2,exp:"An aggregate that counts rows."},
+          {stem:"{k:v for k,v in [('a',1)]} = ?",opts:["{'a':1}","[('a',1)]","{'a'}","('a',1)"],a:0,d:3,exp:"A dict comprehension building {'a':1}."}],
+    project:"Use sqlite3 to create a students table, insert 3 rows, then SELECT and print them."},
+   {n:5,title:"Iterables, Iterators & Generators",
+    topics:["Iterable protocol","Custom iterator classes","Generators & yield","Lazy evaluation / itertools"],
+    quiz:[{stem:"Which keyword makes a generator?",opts:["return","yield","break","def only"],a:1,d:1,exp:"yield produces values one at a time."},
+          {stem:"Benefit of lazy evaluation?",opts:["Uses more memory","Produces on demand, saving memory","Slower","Must be sorted"],a:1,d:1,exp:"It computes only when needed, handling large/infinite sequences."},
+          {stem:"Which method must an iterator define?",opts:["__len__","__next__","__add__","__str__"],a:1,d:2,exp:"__next__ returns the next value (and raises StopIteration at the end)."},
+          {stem:"Calling next() past the end raises?",opts:["EndError","StopIteration","IndexError","ValueError"],a:1,d:2,exp:"StopIteration signals exhaustion."},
+          {stem:"A generator expression (x*x for x in r) vs a list comp differs how?",opts:["Same thing","It's lazy — yields one at a time, no full list stored","It's faster to index","It sorts"],a:1,d:3,exp:"Generators don't build the whole sequence in memory."},
+          {stem:"def g(): yield 1; yield 2 — what is list(g())?",opts:["[1]","[1,2]","(1,2)","1"],a:1,d:2,exp:"list() drains the generator, collecting each yielded value → [1,2]."},
+          {stem:"Calling iter(x) on an iterable returns?",opts:["The length","An iterator object","A list","None"],a:1,d:3,exp:"iter() gives an iterator whose __next__ yields items one by one."},
+          {stem:"An iterable is something you can?",opts:["Only index","Loop over (for)","Only sort","Only print"],a:1,d:1,exp:"It supports iteration."},
+          {stem:"yield differs from return because it?",opts:["Ends the function","Pauses, keeps state, resumes later","Is faster","Prints"],a:1,d:1,exp:"Generators suspend and resume at yield."},
+          {stem:"next(iter([9,8])) = ?",opts:["8","9","[9,8]","2"],a:1,d:2,exp:"The first item from the iterator → 9."},
+          {stem:"A generator computes values?",opts:["All up front","Lazily, on demand","Randomly","Never"],a:1,d:2,exp:"It yields one at a time as requested."},
+          {stem:"After a generator is exhausted, iterating again yields?",opts:["The same values","Nothing (it's spent)","An error","Reversed"],a:1,d:3,exp:"Generators are single-use."},
+          {stem:"sum(x for x in range(4)) = ?",opts:["6","10","4","0"],a:0,d:2,exp:"0+1+2+3=6 via a generator expression."},
+          {stem:"itertools.count() produces?",opts:["A list","An infinite lazy counter","A dict","One value"],a:1,d:3,exp:"It yields numbers forever, lazily."}],
+    project:"Write a generator for the Fibonacci sequence and take the first 10 values."},
+   {n:6,title:"The Python Data Model",
+    topics:["__len__, indexing, slicing","Hashing","Operator overloading","Attribute resolution"],
+    quiz:[{stem:"To overload the + operator, define?",opts:["__plus__","__add__","__sum__","__concat__"],a:1,d:1,exp:"__add__ implements the + operator."},
+          {stem:"len(obj) calls?",opts:["__size__","__len__","__count__","__num__"],a:1,d:1,exp:"__len__."},
+          {stem:"obj[2] triggers which method?",opts:["__index__","__getitem__","__slice__","__at__"],a:1,d:2,exp:"__getitem__ handles indexing and slicing."},
+          {stem:"For an object to be a dict key it must be?",opts:["A string","Hashable (define __hash__)","A number","Mutable"],a:1,d:2,exp:"Keys must be hashable and stable."},
+          {stem:"print(obj) uses __str__; the interactive echo uses?",opts:["__show__","__repr__","__print__","__disp__"],a:1,d:3,exp:"__repr__ is the fallback/developer representation."},
+          {stem:"To make a==b compare by value, define?",opts:["__equal__","__eq__","__cmp__","__is__"],a:1,d:2,exp:"__eq__ defines how == compares two objects."},
+          {stem:"To make your object work with for-loops and indexing, define?",opts:["__len__ and __getitem__","__add__","__call__","__hash__ only"],a:0,d:3,exp:"__getitem__ (and often __len__) makes an object behave like a sequence."},
+          {stem:"__eq__ defines the behavior of?",opts:["+","==","len()","[]"],a:1,d:1,exp:"It controls == comparisons."},
+          {stem:"obj[i]=v triggers?",opts:["__getitem__","__setitem__","__len__","__add__"],a:1,d:1,exp:"__setitem__ handles index assignment."},
+          {stem:"__repr__ is meant to be?",opts:["Pretty for users","Unambiguous for developers","Empty","A number"],a:1,d:2,exp:"repr gives a precise developer-facing string."},
+          {stem:"For 'for x in obj' to work, obj should define?",opts:["__add__","__iter__ (or __getitem__)","__str__","__eq__"],a:1,d:2,exp:"__iter__ makes it iterable."},
+          {stem:"If __eq__ is defined but not __hash__, instances become?",opts:["Faster","Unhashable by default","Immutable","Sorted"],a:1,d:3,exp:"Defining __eq__ sets __hash__ to None unless you set it."},
+          {stem:"a<b uses which special method?",opts:["__less__","__lt__","__cmp__","__min__"],a:1,d:2,exp:"__lt__ implements the < operator."},
+          {stem:"__len__ must return a value that is?",opts:["Any float","A non-negative int","A string","Optional"],a:1,d:3,exp:"len() requires a non-negative integer."}],
+    project:"Write a Vector class overloading + and __str__ so v1+v2 works."},
+   {n:7,title:"Inheritance, MRO & Recursion",
+    topics:["Single & multiple inheritance","Method resolution order (MRO)","Recursion depth & tail recursion","Multiple recursion"],
+    quiz:[{stem:"A subclass calls a parent method with?",opts:["parent()","super()","base()","this()"],a:1,d:1,exp:"super() accesses the parent class."},
+          {stem:"MRO determines?",opts:["File order","Method lookup order under multiple inheritance","Memory","Network speed"],a:1,d:1,exp:"Method resolution order."},
+          {stem:"If a subclass redefines a parent method, that is?",opts:["Overloading","Overriding","Shadowing files","Inheritance error"],a:1,d:2,exp:"Overriding replaces the inherited behavior."},
+          {stem:"Same method name behaving per object's class is called?",opts:["Encapsulation","Polymorphism","Recursion","Iteration"],a:1,d:2,exp:"Polymorphism: one interface, many implementations."},
+          {stem:"Why does Python use C3 linearization for MRO?",opts:["Speed","Consistent, predictable order with multiple inheritance","Security","Smaller files"],a:1,d:3,exp:"It gives a well-defined, monotonic method lookup order."},
+          {stem:"A child __init__ should usually call?",opts:["parent.__init__()","super().__init__()","self.__init__()","nothing"],a:1,d:2,exp:"super().__init__() runs the parent's setup so inherited state is initialized."},
+          {stem:"C.__mro__ gives you?",opts:["The class size","The ordered list of classes Python searches for methods","The source file","Only the parent"],a:1,d:3,exp:"It shows the method resolution order Python follows."},
+          {stem:"A subclass automatically gets the parent's?",opts:["Nothing","Methods and attributes","Only names","Only files"],a:1,d:1,exp:"Inheritance passes down behavior."},
+          {stem:"super() is most often used in?",opts:["__str__","__init__ to call the parent","loops","imports"],a:1,d:1,exp:"To run the parent's initializer."},
+          {stem:"class B(A) means B is a ___ of A.",opts:["parent","subclass/child","module","copy"],a:1,d:2,exp:"B inherits from A."},
+          {stem:"Overriding a method means the subclass?",opts:["Deletes it","Provides its own version","Renames the file","Adds a loop"],a:1,d:2,exp:"It replaces the inherited behavior."},
+          {stem:"With multiple inheritance, method lookup follows the?",opts:["Alphabet","MRO (C3 linearization)","File size","Random order"],a:1,d:3,exp:"The MRO defines a consistent search order."},
+          {stem:"Given Dog(Animal) and d=Dog(), isinstance(d,Animal) is?",opts:["False","True","Error","None"],a:1,d:2,exp:"A Dog is also an Animal via inheritance."},
+          {stem:"Naive multiple recursion (fib calling itself twice) is slow due to?",opts:["Disk I/O","Recomputed overlapping subproblems","Networking","Imports"],a:1,d:3,exp:"Repeated subproblems blow up unless memoized."}],
+    project:"Design Animal → Dog/Cat inheritance, override speak() in each, and demonstrate polymorphism."},
+   {n:8,title:"Memoization, DP, Lambda & Decorators",
+    topics:["Memoization & dynamic programming","Lambda & higher-order functions","Decorators intro","Function transformation"],
+    quiz:[{stem:"What does memoization do?",opts:["Encrypt","Cache computed results to avoid recomputing","Network","Sort"],a:1,d:1,exp:"It caches subproblem results to speed things up (e.g. fib)."},
+          {stem:"A decorator is essentially?",opts:["A class","A function that takes a function and returns a new one","A variable","A file"],a:1,d:1,exp:"A higher-order function that wraps the original function."},
+          {stem:"Naive recursive fib(n) has time complexity?",opts:["O(n)","O(2^n)","O(log n)","O(1)"],a:1,d:2,exp:"It recomputes subproblems exponentially; memoization fixes it to O(n)."},
+          {stem:"@mydec above def f(): is shorthand for?",opts:["f = mydec","f = mydec(f)","mydec = f","del f"],a:1,d:2,exp:"The decorator wraps f and rebinds the name."},
+          {stem:"Dynamic programming mainly trades?",opts:["Nothing","Memory for speed (store subresults)","Speed for memory only","Accuracy"],a:1,d:3,exp:"It stores overlapping subproblem answers to avoid recomputation."},
+          {stem:"With memoization, fib(n) time complexity becomes?",opts:["O(2^n)","O(n)","O(n²)","O(log n)"],a:1,d:2,exp:"Each subproblem is computed once → linear O(n)."},
+          {stem:"Inside a decorator, what do you usually return?",opts:["The original function unchanged","A new wrapper function","A string","None"],a:1,d:3,exp:"You return a wrapper that adds behavior around the original call."},
+          {stem:"Memoization trades memory to gain?",opts:["Accuracy","Speed","Disk","Security"],a:1,d:1,exp:"Cached results avoid recomputation."},
+          {stem:"A decorator wraps a function to?",opts:["Delete it","Add behavior around it","Rename the file","Slow it"],a:1,d:1,exp:"It returns a new function adding behavior."},
+          {stem:"DP suits problems with ___ subproblems.",opts:["Unique","Overlapping","Random","No"],a:1,d:2,exp:"Overlapping subproblems benefit from caching."},
+          {stem:"Writing @dec above def f(): rebinds f to?",opts:["None","dec(f)","f itself","dec"],a:1,d:2,exp:"f becomes the decorated result dec(f)."},
+          {stem:"A closure is a function that remembers?",opts:["Nothing","Variables from its enclosing scope","Only globals","The file"],a:1,d:3,exp:"It captures enclosing local variables."},
+          {stem:"Top-down DP is usually implemented with?",opts:["Loops only","Recursion + memoization","SQL","Sockets"],a:1,d:2,exp:"Recursion that caches results is top-down DP."},
+          {stem:"A wrapper inside a decorator uses ___ to forward any arguments.",opts:["nothing","*args, **kwargs","global","yield"],a:1,d:3,exp:"So it can wrap functions of any signature."}],
+    project:"Write a @timer decorator that prints how long the decorated function takes."},
+   {n:9,title:"Advanced Decorators",
+    topics:["Decorators with arguments","Class-based decorators","Stdlib decorators (functools)","@property, @lru_cache"],
+    quiz:[{stem:"What does @lru_cache do?",opts:["Encrypt","Automatically cache function results","Draw","Network"],a:1,d:1,exp:"A memoization cache provided by functools."},
+          {stem:"A decorator that takes arguments needs?",opts:["Two nested function layers","Three classes","One file","It's impossible"],a:0,d:2,exp:"An extra layer to receive the arguments, returning the real decorator."},
+          {stem:"@property lets you?",opts:["Hide the class","Access a method as if it were an attribute","Delete data","Add threads"],a:1,d:2,exp:"obj.x calls the getter without ()."},
+          {stem:"@functools.wraps is used to?",opts:["Speed up","Preserve the wrapped function's name/docstring","Encrypt","Cache"],a:1,d:3,exp:"It copies metadata so the decorated function still 'looks' like the original."},
+          {stem:"@repeat(3) above a function requires the decorator to be?",opts:["A single function","A factory that takes 3 and returns a decorator","A class attribute","Impossible"],a:1,d:3,exp:"A decorator with arguments needs an outer factory layer that captures 3."},
+          {stem:"Without @functools.wraps, f.__name__ after decoration shows?",opts:["The original name","The wrapper's name","An error","Empty string"],a:1,d:2,exp:"Metadata is lost, so it reports the inner wrapper's name."},
+          {stem:"@staticmethod differs from a normal method because it?",opts:["Takes self","Takes no self/cls","Runs faster","Needs a decorator arg"],a:1,d:2,exp:"A static method receives neither self nor cls."},
+          {stem:"A class-based decorator must implement which method to be callable?",opts:["__init__ only","__call__","__str__","__len__"],a:1,d:3,exp:"Defining __call__ lets an instance act like a function."},
+          {stem:"@classmethod receives as its first argument?",opts:["self","cls (the class)","nothing","the instance"],a:1,d:2,exp:"A classmethod gets the class object cls."},
+          {stem:"@lru_cache(maxsize=None) means the cache?",opts:["Is disabled","Has no size limit","Holds 1 item","Encrypts"],a:1,d:2,exp:"maxsize=None makes the cache grow without bound."},
+          {stem:"Stacking @a then @b above def f wraps it as?",opts:["a(b(f))","b(a(f))","a(f) only","b(f) only"],a:0,d:3,exp:"Decorators apply bottom-up: b first, then a wraps the result."},
+          {stem:"@property paired with @x.setter lets you?",opts:["Only read","Read and validate on write","Delete the class","Add threads"],a:1,d:1,exp:"The getter reads and the setter validates on assignment."},
+          {stem:"@property with only a getter makes the attribute?",opts:["Writable","Read-only","Global","Deleted"],a:1,d:2,exp:"Without a setter, assigning to it raises AttributeError."},
+          {stem:"A decorator factory like @retry(3) returns?",opts:["The result directly","A decorator that then wraps the function","A number","None"],a:1,d:3,exp:"The outer call returns the actual decorator, capturing the argument."}],
+    project:"Write a @repeat(n) decorator that runs the function n times."},
+   {n:10,title:"Pythonic Class Design",
+    topics:["namedtuple","Attribute customization & properties","dataclasses","Design comparisons"],
+    quiz:[{stem:"@dataclass auto-generates?",opts:["Networking","__init__/__repr__ and more","Files","Threads"],a:1,d:1,exp:"It auto-generates boilerplate methods."},
+          {stem:"@property makes a method?",opts:["Slower","Accessible like an attribute","Disappear","Global"],a:1,d:1,exp:"Accessed as obj.x instead of obj.x()."},
+          {stem:"namedtuple gives you?",opts:["A mutable list","A lightweight immutable record with named fields","A dict","A set"],a:1,d:2,exp:"Tuple with field names, e.g. Point(x=1,y=2)."},
+          {stem:"A key advantage of @dataclass over writing __init__ by hand?",opts:["Faster runtime","Less boilerplate, fewer bugs","Uses threads","Encrypts data"],a:1,d:2,exp:"It removes repetitive constructor/repr/eq code."},
+          {stem:"@dataclass(frozen=True) makes instances?",opts:["Faster","Immutable (can't reassign fields)","Global","Hashless"],a:1,d:3,exp:"Frozen dataclasses are read-only and hashable."},
+          {stem:"To validate a value when setting obj.x, you use?",opts:["@property alone","a @x.setter method","__init__ only","a global"],a:1,d:3,exp:"The @x.setter runs your check whenever obj.x is assigned."},
+          {stem:"A namedtuple field can be changed after creation?",opts:["Yes, freely","No — it's immutable","Only the first","Only integers"],a:1,d:2,exp:"namedtuples are immutable like regular tuples."},
+          {stem:"To compare two dataclass instances by field values, @dataclass provides?",opts:["__eq__ automatically","Nothing","__lt__ only","threads"],a:0,d:2,exp:"@dataclass auto-generates __eq__ comparing fields."},
+          {stem:"Accessing p.x on a namedtuple Point(x,y) works because?",opts:["It's a dict","Fields have names","It's global","Magic"],a:1,d:2,exp:"namedtuple exposes fields by name and by index."},
+          {stem:"A @dataclass field with a default is written as?",opts:["x=5 in body","x:int=5","def x():","x!=5"],a:1,d:2,exp:"Annotated field with default: name:type=value."},
+          {stem:"To make a dataclass sortable with <, use?",opts:["order=True","frozen=True","slots only","nothing"],a:0,d:3,exp:"@dataclass(order=True) generates comparison methods."},
+          {stem:"A read-only computed attribute (like area) is best done with?",opts:["a plain method","@property","a global var","a list"],a:1,d:1,exp:"@property exposes a computed value as an attribute."},
+          {stem:"Compared to a plain tuple, a namedtuple mainly improves?",opts:["Speed","Readability (named fields)","Memory a lot","Security"],a:1,d:2,exp:"Named fields make code clearer than index access."},
+          {stem:"@dataclass by default generates which method for printing?",opts:["__len__","__repr__","__iter__","__call__"],a:1,d:1,exp:"It auto-generates a helpful __repr__."}],
+    project:"Use @dataclass to define Point(x,y), then add a @property distance_from_origin."},
+   {n:11,title:"FINAL EXAM WEEK",
+    topics:["Comprehensive review: complexity → iterators/generators → data model → inheritance → decorators → dataclass","Go through all the Notes","Hands-on lab practice"],
+    quiz:[{stem:"The core theme of this course is?",opts:["Just syntax","Writing idiomatic, efficient Python with complexity awareness","Only web pages","Only C"],a:1,d:1,exp:"Pythonic code plus performance/complexity thinking."},
+          {stem:"Which is O(1) average time?",opts:["Searching a list","Dict/set lookup by key","Sorting","Nested loop"],a:1,d:2,exp:"Hash-based lookup is roughly constant time."},
+          {stem:"Generators are preferred over lists when?",opts:["Data is tiny","Data is huge/streaming and you want low memory","You need indexing","Never"],a:1,d:3,exp:"Lazy iteration avoids storing everything at once."},
+          {stem:"@lru_cache helps most when a function is?",opts:["Called once","Called repeatedly with the same arguments","Random","Void"],a:1,d:2,exp:"It reuses cached results for repeated identical calls."},
+          {stem:"To read a 10GB file line-by-line with low memory, you should?",opts:["Read it all into a list","Iterate the file object lazily","Sort it first","Use a set"],a:1,d:3,exp:"Iterating the file yields one line at a time without loading it all."},
+          {stem:"A list comprehension vs a generator expression differ how?",opts:["Syntax only","Eager list vs lazy iterator","Nothing","Speed only"],a:1,d:2,exp:"[] builds a full list; () yields lazily."},
+          {stem:"Inheritance models which relationship?",opts:["has-a","is-a","uses-a","near-a"],a:1,d:1,exp:"A subclass is-a specialization of its parent."},
+          {stem:"Implementing __iter__ and __next__ makes an object?",opts:["Callable","An iterator","A dict","Immutable"],a:1,d:2,exp:"Those methods define the iterator protocol."},
+          {stem:"Which best reduces boilerplate for a data-holding class?",opts:["Manual __init__","@dataclass","global vars","a while loop"],a:1,d:2,exp:"@dataclass generates init/repr/eq automatically."},
+          {stem:"Amortized Big-O of appending to the end of a list?",opts:["O(1)","O(n)","O(log n)","O(n squared)"],a:0,d:3,exp:"Append is amortized constant time."},
+          {stem:"A generator function is distinguished by which keyword?",opts:["return","yield","async","lambda"],a:1,d:2,exp:"yield turns a function into a generator."},
+          {stem:"Average time for a dict lookup by key is?",opts:["O(n)","O(1)","O(log n)","O(n²)"],a:1,d:2,exp:"Hashing gives average constant-time lookup."}],
+    project:"Capstone: build a small tool that combines generators + decorators + dataclass."}
+  ]},
+
+ math2a:{ code:"MATH 2A", name:"Single-Variable Calculus I", term:"Fall", start:"2026-09-28",
+  exams:{4:"MIDTERM 1",8:"MIDTERM 2",11:"FINAL EXAM"},
+  weeks:[
+   {n:1,title:"Functions, Transformations & Inverses",
+    topics:["Functions & domain/range","Transformations (shift, stretch, reflect)","Slope & average rate of change","Inverse functions"],
+    quiz:[{stem:"f(x)=x² shifted right by 3 is?",opts:["(x+3)²","(x-3)²","x²+3","x²-3"],a:1,d:1,exp:"Shifting right by h gives (x-h)²."},
+          {stem:"Condition for a function to have an inverse?",opts:["Continuous","One-to-one (passes the horizontal line test)","Is a polynomial","Passes through the origin"],a:1,d:1,exp:"It must be one-to-one."},
+          {stem:"Domain of f(x)=√(x-2)?",opts:["x≥2","x>0","all reals","x≤2"],a:0,d:2,exp:"Need x-2≥0, so x≥2."},
+          {stem:"Average rate of change of f on [a,b] is?",opts:["f(b)-f(a)","[f(b)-f(a)]/(b-a)","f'(a)","(b-a)/2"],a:1,d:2,exp:"It's the slope of the secant line."},
+          {stem:"If f(x)=2x+1, its inverse f⁻¹(x) is?",opts:["(x-1)/2","2x-1","1/(2x+1)","x/2+1"],a:0,d:3,exp:"Swap x,y and solve: y=(x-1)/2."},
+          {stem:"f(x)=x²-4x shifted to vertex form is?",opts:["(x-2)²-4","(x-2)²+4","(x+2)²-4","(x-4)²"],a:0,d:2,exp:"Complete the square: x²-4x=(x-2)²-4."},
+          {stem:"The graph of y=-f(x) is f reflected across the?",opts:["y-axis","x-axis","line y=x","origin only"],a:1,d:2,exp:"Negating the output flips the graph vertically (across the x-axis)."},
+          {stem:"The domain of f(x)=1/(x-3) excludes?",opts:["x=0","x=3","x=1","nothing"],a:1,d:1,exp:"Denominator zero at x=3 is excluded."},
+          {stem:"y=f(x)+2 shifts the graph?",opts:["Right 2","Up 2","Down 2","Left 2"],a:1,d:1,exp:"Adding to the output shifts up."},
+          {stem:"y=f(-x) reflects across the?",opts:["x-axis","y-axis","line y=x","origin"],a:1,d:2,exp:"Negating input flips horizontally across the y-axis."},
+          {stem:"The graphs of f and f⁻¹ are symmetric about?",opts:["x-axis","the line y=x","y-axis","origin"],a:1,d:2,exp:"Inverse functions mirror across y=x."},
+          {stem:"Range of f(x)=x²+1?",opts:["all reals","y≥1","y≥0","y>1"],a:1,d:2,exp:"x²≥0 so x²+1≥1."},
+          {stem:"If f(2)=5 and f is one-to-one, then f⁻¹(5)=?",opts:["2","5","1/5","10"],a:0,d:3,exp:"Inverse undoes f: f⁻¹(5)=2."},
+          {stem:"y=2f(x) is a vertical?",opts:["shift up 2","stretch by factor 2","shrink by 2","reflection"],a:1,d:2,exp:"Multiplying output by 2 stretches vertically."}],
+    project:"Graph f(x)=√x and its shifts/reflections, labeling the domain and range."},
+   {n:2,title:"Tangents, Limits & Continuity",
+    topics:["Tangent line & slope idea","Limit definition (intuitive)","Limit laws & calculating limits","Continuity"],
+    quiz:[{stem:"lim(x→2) (x²-4)/(x-2) = ?",opts:["0","2","4","Does not exist"],a:2,d:1,exp:"Simplifies to x+2; plug in 2 → 4."},
+          {stem:"Continuity at a point a requires?",opts:["Only that f(a) exists","The limit = f(a) and both exist","Being differentiable","Being a line"],a:1,d:1,exp:"The limit exists, f(a) exists, and they are equal."},
+          {stem:"lim(x→3) (2x+1) = ?",opts:["7","6","3","∞"],a:0,d:2,exp:"Polynomials are continuous: just plug in → 7."},
+          {stem:"A limit fails to exist at a jump because?",opts:["f(a) is huge","Left and right limits differ","It's negative","x is zero"],a:1,d:2,exp:"One-sided limits must agree for the limit to exist."},
+          {stem:"lim(x→0) (√(x+1)-1)/x = ?",opts:["0","1/2","1","DNE"],a:1,d:3,exp:"Rationalize: → 1/(√(x+1)+1) → 1/2."},
+          {stem:"lim(x→2) (x²-4)/(x²-x-2) = ?",opts:["4/3","1","2","DNE"],a:0,d:3,exp:"Factor: (x-2)(x+2)/[(x-2)(x+1)] → (x+2)/(x+1) → 4/3."},
+          {stem:"lim(x→1⁻) and lim(x→1⁺) both equal 5, but f(1)=2. Is f continuous at 1?",opts:["Yes","No — limit≠f(1)","Only from the left","Cannot tell"],a:1,d:2,exp:"Continuity needs the limit to equal f(1); here 5≠2."},
+          {stem:"lim(x→0) (x²+3x)/x = ?",opts:["0","3","∞","DNE"],a:1,d:2,exp:"Factor x: (x+3) → 3."},
+          {stem:"A removable discontinuity is a?",opts:["Jump","Hole that a limit fills","Vertical asymptote","Corner"],a:1,d:2,exp:"A hole where the limit exists but f is undefined/mismatched."},
+          {stem:"lim(x→5) 7 = ?",opts:["5","7","0","∞"],a:1,d:1,exp:"The limit of a constant is the constant."},
+          {stem:"For the limit at a to exist, we need?",opts:["f(a) defined","left limit = right limit","f increasing","a=0"],a:1,d:1,exp:"One-sided limits must agree."},
+          {stem:"lim(x→∞) (5x)/(x+2) = ?",opts:["5","0","∞","2"],a:0,d:3,exp:"Divide by x: 5/(1+2/x) → 5."},
+          {stem:"The slope of the tangent is the limit of?",opts:["areas","secant slopes","f values","products"],a:1,d:2,exp:"Tangent slope = limit of secant slopes."},
+          {stem:"lim(x→3) (x²-9)/(x-3) = ?",opts:["0","3","6","DNE"],a:2,d:2,exp:"(x-3)(x+3)/(x-3)=x+3→6."}],
+    project:"Use a table of values to approximate lim(x→0) sin(x)/x and watch it approach 1."},
+   {n:3,title:"IVT, Limits at Infinity & The Derivative",
+    topics:["Intermediate Value Theorem","Limits at infinity & asymptotes","Definition of derivative (limit)","Derivative as a function"],
+    quiz:[{stem:"The definition of the derivative f'(a) is?",opts:["f(a)/a","lim h→0 [f(a+h)-f(a)]/h","f(a)·a","slope×2"],a:1,d:1,exp:"The limit of the difference quotient."},
+          {stem:"lim(x→∞) 1/x = ?",opts:["∞","1","0","Does not exist"],a:2,d:1,exp:"As x grows larger, 1/x shrinks toward 0."},
+          {stem:"lim(x→∞) (3x²+1)/(x²+5) = ?",opts:["3","0","∞","1"],a:0,d:2,exp:"Ratio of leading coefficients → 3."},
+          {stem:"The IVT guarantees a root when on [a,b]?",opts:["f is increasing","f is continuous and f(a),f(b) have opposite signs","f is linear","f(a)=f(b)"],a:1,d:2,exp:"A continuous function must cross every value between f(a) and f(b)."},
+          {stem:"Geometrically, f'(a) is?",opts:["Area under f","Slope of the tangent line at a","The y-intercept","Average of f"],a:1,d:3,exp:"The derivative is the instantaneous slope."},
+          {stem:"lim(x→∞) (2x³+x)/(x³-4) = ?",opts:["2","0","∞","1/2"],a:0,d:2,exp:"Same degree → ratio of leading coefficients = 2."},
+          {stem:"Using the limit definition, f'(x) for f(x)=3x+1 is?",opts:["3","3x","1","3x+1"],a:0,d:3,exp:"[3(x+h)+1-(3x+1)]/h = 3h/h = 3."},
+          {stem:"lim(x→∞) 5/x² = ?",opts:["5","0","∞","1"],a:1,d:1,exp:"Denominator grows → 0."},
+          {stem:"A horizontal asymptote of (2x+1)/(x-3) is?",opts:["y=2","y=0","y=1","none"],a:0,d:2,exp:"Equal degrees → ratio of leading coeffs = 2."},
+          {stem:"IVT requires the function to be?",opts:["differentiable","continuous on [a,b]","linear","positive"],a:1,d:1,exp:"Continuity is the key hypothesis."},
+          {stem:"f'(x) as a function gives?",opts:["one number","the slope at each x","the area","the max"],a:1,d:2,exp:"The derivative function outputs slope at each point."},
+          {stem:"Using the definition, f'(x) for f(x)=x² is?",opts:["x","2x","x²","2"],a:1,d:3,exp:"[(x+h)²-x²]/h=2x+h→2x."},
+          {stem:"lim(x→∞) (x²+1)/(2x²+x) = ?",opts:["1/2","1","2","0"],a:0,d:2,exp:"Ratio of leading coefficients 1/2."},
+          {stem:"If f is continuous on [0,2], f(0)=-1, f(2)=3, IVT guarantees?",opts:["a max at 2","a c with f(c)=0","f is linear","f'=0"],a:1,d:2,exp:"Opposite signs → a root in between."}],
+    project:"Use the definition (a limit) to find the derivative of f(x)=x² and verify it equals 2x."},
+   {n:4,title:"Differentiation Rules · MIDTERM 1",
+    topics:["Power / constant / sum rules","Product rule","Quotient rule","Midterm review"],
+    quiz:[{stem:"d/dx (x⁵) = ?",opts:["5x⁴","x⁴","5x⁵","4x⁵"],a:0,d:1,exp:"Power rule: n·x^(n-1)."},
+          {stem:"(uv)' = ?",opts:["u'v'","u'v+uv'","u'v-uv'","u'/v'"],a:1,d:1,exp:"The product rule."},
+          {stem:"d/dx (3x²+2x-7) = ?",opts:["6x+2","3x+2","6x+2x","6x-7"],a:0,d:2,exp:"Term by term: 6x + 2 + 0."},
+          {stem:"(u/v)' = ?",opts:["u'/v'","(u'v-uv')/v²","(u'v+uv')/v²","u'v'-1"],a:1,d:2,exp:"Quotient rule: low·d(high) - high·d(low), over low²."},
+          {stem:"d/dx [x²·(x+1)] using product rule = ?",opts:["2x","3x²+2x","x²+2x","2x+1"],a:1,d:3,exp:"2x(x+1)+x²·1 = 3x²+2x."},
+          {stem:"d/dx (x/(x+1)) = ?",opts:["1","1/(x+1)²","x/(x+1)²","1/(x+1)"],a:1,d:3,exp:"Quotient rule: [(1)(x+1)-x(1)]/(x+1)² = 1/(x+1)²."},
+          {stem:"d/dx (√x) = ?",opts:["1/(2√x)","2√x","√x/2","1/√x"],a:0,d:2,exp:"√x = x^(1/2), so derivative is (1/2)x^(-1/2) = 1/(2√x)."},
+          {stem:"d/dx (7) = ?",opts:["7","0","1","x"],a:1,d:1,exp:"Derivative of a constant is 0."},
+          {stem:"d/dx (4x³) = ?",opts:["12x²","4x²","12x³","3x²"],a:0,d:1,exp:"4·3x²=12x²."},
+          {stem:"d/dx (x⁻²) = ?",opts:["-2x⁻³","2x⁻³","-2x⁻¹","x⁻³"],a:0,d:2,exp:"Power rule: -2x^(-3)."},
+          {stem:"d/dx [(x+1)(x+2)] = ?",opts:["2x+3","x+3","2x+2","2x+1"],a:0,d:2,exp:"Expand x²+3x+2 → 2x+3."},
+          {stem:"d/dx (1/x) = ?",opts:["-1/x²","1/x²","ln x","-1/x"],a:0,d:2,exp:"1/x=x⁻¹ → -x⁻²=-1/x²."},
+          {stem:"d/dx ((x+1)/x) = ?",opts:["1","-1/x²","1/x²","-1/x"],a:1,d:3,exp:"Quotient rule: [x-(x+1)]/x²=-1/x²."},
+          {stem:"d/dx (2x⁴-3x²+x) = ?",opts:["8x³-6x+1","8x³-6x","2x³-3x","8x⁴-6x"],a:0,d:2,exp:"Term by term: 8x³-6x+1."}],
+    project:"Midterm review: differentiate (3x²+2x)(x-1) both with the product rule and by expanding, then compare."},
+   {n:5,title:"Trig Derivatives, Chain Rule & Implicit",
+    topics:["Derivatives of sin, cos, tan","Chain rule","Implicit differentiation","Higher-order derivatives"],
+    quiz:[{stem:"d/dx sin(x) = ?",opts:["cos(x)","-cos(x)","-sin(x)","tan(x)"],a:0,d:1,exp:"The derivative of sin is cos."},
+          {stem:"d/dx (x²+1)³ uses?",opts:["Power rule","Chain rule","Product rule","Quotient rule"],a:1,d:1,exp:"Outer power × inner derivative → 3(x²+1)²·2x."},
+          {stem:"d/dx cos(x) = ?",opts:["sin(x)","-sin(x)","-cos(x)","sec(x)"],a:1,d:2,exp:"The derivative of cos is -sin."},
+          {stem:"d/dx sin(3x) = ?",opts:["cos(3x)","3cos(3x)","-3cos(3x)","3sin(3x)"],a:1,d:2,exp:"Chain rule: cos(3x)·3."},
+          {stem:"For x²+y²=25, dy/dx = ?",opts:["-x/y","x/y","-y/x","2x"],a:0,d:3,exp:"Differentiate implicitly: 2x+2y·y'=0 → y'=-x/y."},
+          {stem:"d/dx tan(x) = ?",opts:["sec²(x)","-csc²(x)","sec(x)tan(x)","cot(x)"],a:0,d:2,exp:"The derivative of tan is sec²(x)."},
+          {stem:"d/dx (sin(x))² = ?",opts:["2sin(x)","2sin(x)cos(x)","cos²(x)","2cos(x)"],a:1,d:3,exp:"Chain rule: 2sin(x)·cos(x) (= sin 2x)."},
+          {stem:"d/dx cos(2x) = ?",opts:["-2sin(2x)","2sin(2x)","-sin(2x)","2cos(2x)"],a:0,d:2,exp:"Chain rule: -sin(2x)·2."},
+          {stem:"d/dx (x³+1)⁵ = ?",opts:["5(x³+1)⁴","5(x³+1)⁴·3x²","3x²","15x²"],a:1,d:2,exp:"Chain rule: 5(x³+1)⁴·3x²."},
+          {stem:"The second derivative of sin(x) is?",opts:["cos(x)","-sin(x)","-cos(x)","sin(x)"],a:1,d:2,exp:"sin→cos→-sin."},
+          {stem:"d/dx sec(x) = ?",opts:["sec(x)tan(x)","-csc(x)cot(x)","tan(x)","sec²(x)"],a:0,d:3,exp:"Derivative of sec is sec·tan."},
+          {stem:"For xy=1, dy/dx = ?",opts:["-y/x","y/x","-x/y","1"],a:0,d:3,exp:"Implicit: y+xy'=0 → y'=-y/x."},
+          {stem:"d/dx cos³(x) = ?",opts:["3cos²(x)","-3cos²(x)sin(x)","3cos²(x)sin(x)","-3sin³(x)"],a:1,d:3,exp:"Chain rule: 3cos²(x)·(-sin x)."},
+          {stem:"The chain rule differentiates a?",opts:["sum","composition f(g(x))","product","quotient"],a:1,d:1,exp:"It handles composite functions."}],
+    project:"Use implicit differentiation to find dy/dx from x²+y²=25."},
+   {n:6,title:"Log/Exp Derivatives & Related Rates",
+    topics:["d/dx eˣ and ln(x)","Logarithmic differentiation","Exponential growth models","Related rates"],
+    quiz:[{stem:"d/dx eˣ = ?",opts:["x·eˣ⁻¹","eˣ","x·eˣ","1"],a:1,d:1,exp:"The derivative of eˣ is eˣ."},
+          {stem:"d/dx ln(x) = ?",opts:["1/x","ln(x)","x","eˣ"],a:0,d:1,exp:"The derivative of ln is 1/x."},
+          {stem:"d/dx e^(2x) = ?",opts:["e^(2x)","2e^(2x)","2x·e^(2x)","e^(2x)/2"],a:1,d:2,exp:"Chain rule: e^(2x)·2."},
+          {stem:"Related rates problems mainly use which rule?",opts:["Product","Chain rule (differentiate w.r.t. time)","Quotient","None"],a:1,d:2,exp:"Differentiate the relation with respect to t via the chain rule."},
+          {stem:"Sphere V=(4/3)πr³; dr/dt=2. dV/dt at r=5?",opts:["100π","200π","50π","400π"],a:1,d:3,exp:"dV/dt=4πr²·dr/dt=4π·25·2=200π."},
+          {stem:"d/dx ln(x²+1) = ?",opts:["1/(x²+1)","2x/(x²+1)","2x","ln(2x)"],a:1,d:2,exp:"Chain rule: (1/(x²+1))·2x."},
+          {stem:"A 10ft ladder slides; bottom moves 3ft/s. This is a ___ problem.",opts:["Optimization","Related rates","Limit","Antiderivative"],a:1,d:3,exp:"Rates linked over time via the chain rule → related rates."},
+          {stem:"d/dx (5eˣ) = ?",opts:["5eˣ","eˣ","5xeˣ⁻¹","5"],a:0,d:1,exp:"Constant multiple of eˣ."},
+          {stem:"d/dx ln(3x) = ?",opts:["1/x","3/x","1/(3x)","3"],a:0,d:2,exp:"Chain rule: (1/(3x))·3=1/x."},
+          {stem:"d/dx e^(x²) = ?",opts:["e^(x²)","2x·e^(x²)","x²e^(x²)","2xe"],a:1,d:2,exp:"Chain rule: e^(x²)·2x."},
+          {stem:"In related rates, you differentiate with respect to?",opts:["x","time t","y","a constant"],a:1,d:1,exp:"Quantities change over time t."},
+          {stem:"Area A=πr², dr/dt=3. dA/dt at r=2?",opts:["6π","12π","4π","9π"],a:1,d:3,exp:"dA/dt=2πr·dr/dt=2π·2·3=12π."},
+          {stem:"d/dx [x·ln(x)] = ?",opts:["1","ln(x)+1","1/x","ln(x)"],a:1,d:2,exp:"Product rule: ln(x)+x·(1/x)=ln(x)+1."},
+          {stem:"d/dx 2^x = ?",opts:["2^x","x·2^(x-1)","2^x·ln2","ln2"],a:2,d:3,exp:"d/dx a^x = a^x·ln a."}],
+    project:"Related rates: a balloon's radius grows at 2 cm/s; find the rate of volume change when r=5."},
+   {n:7,title:"Exponential Models & Linear Approximation",
+    topics:["Compound interest & growth/decay","Newton's Law of Cooling","Linear approximation & differentials","Tangent line approximation"],
+    quiz:[{stem:"Continuous compound interest formula?",opts:["A=P(1+r)ᵗ","A=Pe^(rt)","A=Prt","A=P/rt"],a:1,d:1,exp:"Continuous compounding uses e^(rt)."},
+          {stem:"Linear approximation estimates a value using which line?",opts:["Secant line","Tangent line","Horizontal line","Vertical line"],a:1,d:1,exp:"It uses the tangent line to approximate the curve nearby."},
+          {stem:"The linearization of f at a is L(x)=?",opts:["f(a)","f(a)+f'(a)(x-a)","f'(a)x","f(a)(x-a)"],a:1,d:2,exp:"Tangent line: value plus slope times displacement."},
+          {stem:"Exponential decay is modeled by?",opts:["y=kx","y=Ce^(kt), k<0","y=x²","y=ln x"],a:1,d:2,exp:"Negative exponent → decay over time."},
+          {stem:"Estimate √4.1 via linear approx at x=4 (f=√x, f'=1/(2√x)):",opts:["2.025","2.05","2.1","2.005"],a:0,d:3,exp:"2 + (1/4)(0.1) = 2.025."},
+          {stem:"The differential dy for y=f(x) is?",opts:["f(x)dx","f'(x)dx","f'(x)","dx/f'(x)"],a:1,d:2,exp:"dy = f'(x)dx approximates the change in y."},
+          {stem:"$1000 at 5% compounded continuously for 2 years ≈? (e^0.1≈1.105)",opts:["$1100","$1105","$1050","$1210"],a:1,d:3,exp:"A=1000·e^(0.05·2)=1000·e^0.1≈$1105."},
+          {stem:"Half-life problems use which type of model?",opts:["Linear","Exponential decay","Quadratic","Trig"],a:1,d:1,exp:"Radioactive decay is exponential."},
+          {stem:"The tangent line at x=a has slope?",opts:["f(a)","f'(a)","0","1"],a:1,d:1,exp:"Slope of the tangent is the derivative f'(a)."},
+          {stem:"Linearize f(x)=x³ at x=2: L(x)=?",opts:["8+12(x-2)","8+6(x-2)","12(x-2)","8+3(x-2)"],a:0,d:3,exp:"f(2)=8, f'(2)=12 → 8+12(x-2)."},
+          {stem:"For small dx, Δy ≈ ?",opts:["f'(x)","f'(x)dx","f(x)dx","dx"],a:1,d:2,exp:"The differential dy=f'(x)dx approximates Δy."},
+          {stem:"Estimate (1.02)⁵ via linear approx (f=x⁵ at x=1):",opts:["1.10","1.00","1.02","1.20"],a:0,d:3,exp:"f(1)=1,f'(1)=5 → 1+5(0.02)=1.10."},
+          {stem:"Newton's Law of Cooling models temperature as?",opts:["linear","approaching ambient exponentially","constant","quadratic"],a:1,d:2,exp:"Temperature difference decays exponentially."},
+          {stem:"Linear approximation is most accurate when x is?",opts:["far from a","close to a","zero","negative"],a:1,d:2,exp:"Accuracy is best near the point of tangency a."}],
+    project:"Use linear approximation to estimate √4.1 (tangent at x=4)."},
+   {n:8,title:"Max/Min & Mean Value Theorem · MIDTERM 2",
+    topics:["Critical points & extrema","First & second derivative tests","Mean Value Theorem","Midterm 2 review"],
+    quiz:[{stem:"To find extrema, first find?",opts:["Zeros","Critical points (f'=0 or undefined)","Asymptotes","Intercepts"],a:1,d:1,exp:"Critical points are the candidates for extrema."},
+          {stem:"f''(x)>0 means the curve is?",opts:["Concave down","Concave up","A straight line","Decreasing"],a:1,d:1,exp:"Second derivative > 0 → concave up."},
+          {stem:"f(x)=x²-4x: its critical point is at x=?",opts:["0","2","4","-2"],a:1,d:2,exp:"f'=2x-4=0 → x=2."},
+          {stem:"At a critical point, f''<0 indicates a?",opts:["Local minimum","Local maximum","Inflection point","Nothing"],a:1,d:2,exp:"Concave down at a critical point → local max."},
+          {stem:"MVT guarantees a c in (a,b) where f'(c) equals?",opts:["0","The average slope [f(b)-f(a)]/(b-a)","f(a)","The max of f"],a:1,d:3,exp:"Some instantaneous slope equals the average slope."},
+          {stem:"f(x)=x³-3x: how many critical points?",opts:["0","1","2","3"],a:2,d:2,exp:"f'=3x²-3=0 → x=±1, two critical points."},
+          {stem:"On [0,3], f(x)=x²-4x has its absolute minimum at x=?",opts:["0","2","3","1"],a:1,d:3,exp:"Vertex at x=2 (inside interval); f(2)=-4 is the min."},
+          {stem:"f(x)=x²+6x: critical point at x=?",opts:["-3","3","6","0"],a:0,d:2,exp:"f'=2x+6=0 gives x=-3."},
+          {stem:"First Derivative Test: f' changes from + to - at c means a?",opts:["Local min","Local max","Inflection","Nothing"],a:1,d:2,exp:"Increasing then decreasing means a local maximum."},
+          {stem:"f''(x)<0 on an interval means the graph is?",opts:["Concave up","Concave down","Linear","Increasing"],a:1,d:1,exp:"A negative second derivative means concave down."},
+          {stem:"MVT requires f continuous on [a,b] and also?",opts:["Differentiable on (a,b)","Positive","Increasing","Bounded only"],a:0,d:2,exp:"Continuity on [a,b] plus differentiability on (a,b)."},
+          {stem:"An absolute extremum on [a,b] can occur at?",opts:["Only interior points","A critical point or an endpoint","Only endpoints","Only x=0"],a:1,d:2,exp:"Check the critical points and both endpoints."},
+          {stem:"f(x)=x³ has f'(0)=0. Is x=0 a max, min, or neither?",opts:["Max","Min","Neither (inflection)","Both"],a:2,d:3,exp:"f' does not change sign, so it is an inflection, not an extremum."},
+          {stem:"For f(x)=x²-4x on [0,3], the absolute max is at x=?",opts:["0","2","3","1"],a:0,d:3,exp:"f(0)=0, f(2)=-4, f(3)=-3; the largest is f(0)=0."}],
+    project:"Midterm review: find the local max/min of f(x)=x³-3x and determine its concavity."},
+   {n:9,title:"L'Hospital's Rule & Curve Sketching",
+    topics:["Indeterminate forms 0/0, ∞/∞","L'Hospital's Rule","Curve sketching (full analysis)","Concavity & inflection points"],
+    quiz:[{stem:"L'Hospital's rule applies to?",opts:["Any limit","0/0 or ∞/∞ forms","Only integers","Addition"],a:1,d:1,exp:"For indeterminate forms, differentiate the numerator and denominator."},
+          {stem:"An inflection point is?",opts:["The highest point","Where concavity changes","A zero","An endpoint"],a:1,d:1,exp:"The point where f'' changes sign."},
+          {stem:"lim(x→0) sin(x)/x by L'Hospital = ?",opts:["0","1","∞","DNE"],a:1,d:2,exp:"cos(0)/1 = 1."},
+          {stem:"To find inflection points, solve?",opts:["f'=0","f''=0 (and it changes sign)","f=0","f'''=0"],a:1,d:2,exp:"Concavity changes where f'' switches sign."},
+          {stem:"lim(x→∞) x/eˣ by L'Hospital = ?",opts:["∞","1","0","e"],a:2,d:3,exp:"1/eˣ → 0; exponential beats polynomial."},
+          {stem:"lim(x→0) (eˣ-1)/x by L'Hospital = ?",opts:["0","1","e","DNE"],a:1,d:2,exp:"eˣ/1 at x=0 = 1."},
+          {stem:"f(x)=x³-3x²: inflection point is at x=?",opts:["0","1","2","3"],a:1,d:3,exp:"f''=6x-6=0 → x=1, where concavity changes."},
+          {stem:"lim(x→∞) (2x²+1)/(x²+x) = ?",opts:["0","1","2","∞"],a:2,d:2,exp:"Ratio of the leading coefficients: 2/1 = 2."},
+          {stem:"L'Hospital's Rule replaces lim f/g with lim?",opts:["f·g","f'/g'","f'-g'","f/g'"],a:1,d:1,exp:"Differentiate the top and bottom separately."},
+          {stem:"lim(x→0) tan(x)/x = ?",opts:["0","1","∞","DNE"],a:1,d:2,exp:"sec²(0)/1 = 1."},
+          {stem:"lim(x→∞) ln(x)/x = ?",opts:["∞","1","0","e"],a:2,d:3,exp:"(1/x)/1 → 0; x grows faster than ln x."},
+          {stem:"f(x)=x⁴ has f''(0)=0. Is x=0 an inflection point?",opts:["Yes","No — concavity does not change","Always","Cannot tell"],a:1,d:3,exp:"f''=12x² does not change sign, so it is not an inflection point."},
+          {stem:"Where is f(x)=x³ concave up?",opts:["x<0","x>0","Everywhere","Nowhere"],a:1,d:2,exp:"f''=6x>0 when x>0."},
+          {stem:"To apply L'Hospital, the limit must first be a(n)?",opts:["Any number","Indeterminate form like 0/0","Negative value","Integer"],a:1,d:1,exp:"It applies only to 0/0 or ∞/∞ forms."}],
+    project:"Fully analyze and hand-sketch f(x)=x³-3x²: critical points, concavity, and inflection points."},
+   {n:10,title:"Optimization & Antiderivatives",
+    topics:["Optimization word problems","Setting up constraint + objective","Antiderivatives","Final review"],
+    quiz:[{stem:"First step of an optimization problem?",opts:["Differentiate right away","Write the objective function + constraints","Draw a graph","Guess the answer"],a:1,d:1,exp:"First set up the objective function and the constraints."},
+          {stem:"An antiderivative of x² is?",opts:["2x","x³/3 + C","x³","2x+C"],a:1,d:1,exp:"Reverse power rule: x³/3 plus a constant C."},
+          {stem:"An antiderivative of cos(x) is?",opts:["-sin(x)","sin(x)+C","-cos(x)","tan(x)"],a:1,d:2,exp:"d/dx sin(x)=cos(x), so ∫cos=sin+C."},
+          {stem:"Why include '+C' in an antiderivative?",opts:["Style","Any constant differentiates to 0, so many antiderivatives exist","Required by IVT","To round"],a:1,d:2,exp:"The derivative of a constant is 0, so C is unknown."},
+          {stem:"Rectangle, perimeter 100, max area at sides?",opts:["10×40","25×25","5×45","20×30"],a:1,d:3,exp:"Max area of a fixed-perimeter rectangle is a square: 25×25."},
+          {stem:"∫(3x²+2x)dx = ?",opts:["x³+x²+C","6x+2+C","x³+x²","3x³+2x²+C"],a:0,d:2,exp:"Reverse power rule term by term: x³+x²+C."},
+          {stem:"An antiderivative of 1/x is?",opts:["ln|x|+C","-1/x²+C","x","eˣ"],a:0,d:3,exp:"∫(1/x)dx = ln|x|+C."},
+          {stem:"An antiderivative of x³ is?",opts:["3x²","x⁴/4 + C","x⁴","4x³"],a:1,d:1,exp:"Reverse power rule: x⁴/4 + C."},
+          {stem:"∫(6x)dx = ?",opts:["3x²+C","6+C","6x²+C","3x+C"],a:0,d:1,exp:"6·x²/2 = 3x²+C."},
+          {stem:"An antiderivative of eˣ is?",opts:["eˣ+C","x·eˣ","eˣ⁻¹","ln x"],a:0,d:2,exp:"∫eˣ dx = eˣ+C."},
+          {stem:"An antiderivative of sin(x) is?",opts:["cos(x)+C","-cos(x)+C","-sin(x)+C","tan(x)"],a:1,d:2,exp:"d/dx(-cos x)=sin x, so ∫sin = -cos+C."},
+          {stem:"In optimization, after building the objective you?",opts:["Stop","Differentiate and set it to 0","Integrate twice","Only draw"],a:1,d:2,exp:"Set the derivative to 0 to find the optimum."},
+          {stem:"Box with square base and fixed volume, minimum surface area — you minimize?",opts:["Volume","Surface area subject to the volume constraint","Perimeter","Nothing"],a:1,d:3,exp:"Use the volume constraint to write surface area in one variable, then minimize."},
+          {stem:"100ft fence, rectangular pen against a wall (3 sides), max area at width?",opts:["25","50","20","10"],a:0,d:3,exp:"2w+L=100, area=w(100-2w), maximum at w=25 (L=50)."}],
+    project:"Optimization: for a rectangle with perimeter 100, find the side lengths that maximize the area."},
+   {n:11,title:"FINAL EXAM WEEK",
+    topics:["Comprehensive review: limits → derivatives → differentiation rules → applications (extrema/related rates/optimization) → antiderivatives","Redo both midterm papers","Organize formulas and problem types"],
+    quiz:[{stem:"The two most central concepts of Calculus I?",opts:["Addition and subtraction","Limits and derivatives","Graphing","Memorizing formulas"],a:1,d:1,exp:"Limits are the foundation; the derivative is the main thread."},
+          {stem:"d/dx (5x³) = ?",opts:["15x²","5x²","15x³","3x²"],a:0,d:2,exp:"Power rule: 5·3x² = 15x²."},
+          {stem:"Where is f(x)=x³-3x increasing?",opts:["Everywhere","|x|>1","|x|<1","Nowhere"],a:1,d:3,exp:"f'=3x²-3>0 when x²>1, i.e. |x|>1."},
+          {stem:"lim(x→0) (1-cos x)/x² = ?",opts:["0","1/2","1","DNE"],a:1,d:3,exp:"L'Hospital twice (or Taylor): → 1/2."},
+          {stem:"∫cos(x)dx from a review standpoint equals?",opts:["-sin(x)+C","sin(x)+C","-cos(x)+C","tan(x)+C"],a:1,d:2,exp:"The antiderivative of cos is sin+C."},
+          {stem:"d/dx (sin x) = ?",opts:["cos x","-cos x","-sin x","sec²x"],a:0,d:1,exp:"The derivative of sin is cos."},
+          {stem:"lim(x→2) (x²-4)/(x-2) = ?",opts:["0","2","4","DNE"],a:2,d:2,exp:"Factor to x+2, then plug in 2 → 4."},
+          {stem:"Product rule: d/dx[f·g] = ?",opts:["f'g'","f'g + fg'","fg'","f'g"],a:1,d:2,exp:"f'g + fg'."},
+          {stem:"Chain rule: d/dx f(g(x)) = ?",opts:["f'(g(x))","f'(g(x))·g'(x)","f'(x)g'(x)","f(g'(x))"],a:1,d:2,exp:"Outer derivative times inner derivative."},
+          {stem:"∫x² dx = ?",opts:["2x+C","x³/3+C","x³+C","3x²+C"],a:1,d:1,exp:"Reverse power rule: x³/3 + C."},
+          {stem:"A related-rates problem links quantities through?",opts:["Addition","The chain rule (differentiate w.r.t. time)","Integration only","Guessing"],a:1,d:3,exp:"Differentiate the relation implicitly with respect to time."},
+          {stem:"d/dx (ln x) = ?",opts:["1/x","x","ln x","eˣ"],a:0,d:2,exp:"The derivative of ln x is 1/x."}],
+    project:"Redo both midterm papers; put any mistakes in the notebook and rework them until all correct."}
+  ]}
+};
+
+// ================= STATE =================
+const KEY="uci_cs_hub_v2";
+let state=JSON.parse(localStorage.getItem(KEY)||"{}");
+if(!state.mastery) state.mastery={};
+if(!state.mistakes) state.mistakes={};
+if(!state.starts) state.starts={};
+if(!state.active) state.active="ics31";
+for(const id in COURSES){ if(!state.starts[id]) state.starts[id]=COURSES[id].start; if(!state.mistakes[id]) state.mistakes[id]=[]; }
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+let ACT=()=>COURSES[state.active];
+
+// ================= TABS =================
+const tabsEl=document.getElementById('tabs');
+function renderTabs(){
+  tabsEl.innerHTML='';
+  for(const id in COURSES){
+    const c=COURSES[id];
+    const d=document.createElement('div');
+    d.className='tab'+(state.active===id?' active':'');
+    d.innerHTML=`<div class="c">${c.code}</div><div class="s">${c.term} · ${c.name}</div>`;
+    d.onclick=()=>{ state.active=id; save(); closePanel(); renderAll(); };
+    tabsEl.appendChild(d);
+  }
+}
+
+// ================= WEEKS =================
+const weeksEl=document.getElementById('weeks');
+function tkey(id,w,i){ return `${id}-w${w}-${i}`; }
+function weekProgress(w){
+  const c=ACT(); const wk=c.weeks.find(x=>x.n===w);
+  let m=0; wk.topics.forEach((_,i)=>{ if(state.mastery[tkey(state.active,w,i)]==='mastered') m++; });
+  return wk.topics.length? Math.round(m/wk.topics.length*100):0;
+}
+function tagFor(w){
+  const e=ACT().exams[w];
+  if(!e) return '';
+  const cls = e.includes('MID')?'mid':e.includes('FINAL')?'fin':e.includes('LAB')?'lab':'rev';
+  return `<span class="tag ${cls}">${e}</span>`;
+}
+function renderWeeks(){
+  weeksEl.innerHTML='';
+  ACT().weeks.forEach(wk=>{
+    const div=document.createElement('div'); div.className='wk';
+    const p=weekProgress(wk.n);
+    div.innerHTML=`${tagFor(wk.n)}<div class="n">WEEK ${wk.n}</div><div class="t">${wk.title}</div>
+      <div class="mini"><span style="width:${p}%"></span></div>`;
+    div.onclick=()=>openWeek(wk.n);
+    weeksEl.appendChild(div);
+  });
+  renderOverall();
+}
+function renderOverall(){
+  const c=ACT(); let tot=0,m=0;
+  c.weeks.forEach(wk=>wk.topics.forEach((_,i)=>{tot++; if(state.mastery[tkey(state.active,wk.n,i)]==='mastered')m++;}));
+  const pct=tot?Math.round(m/tot*100):0;
+  document.getElementById('overallBar').style.width=pct+'%';
+  document.getElementById('pctText').textContent=pct+'%';
+}
+
+// ================= PANEL =================
+const panel=document.getElementById('panel');
+function openWeek(n){
+  const id=state.active; const wk=ACT().weeks.find(x=>x.n===n);
+  let html=`<div class="phead"><h2>${ACT().code} · Week ${wk.n} — ${wk.title}</h2>
+    <button class="close" onclick="closePanel()">✕ close</button></div><div class="pbody">`;
+  html+=`<div class="sec"><h3>📚 Topics & Mastery</h3>`;
+  wk.topics.forEach((t,i)=>{
+    const k=tkey(id,n,i); const st=state.mastery[k]||'not';
+    html+=`<div class="kp ${st==='mastered'?'mastered':st==='learning'?'learning':''}" id="kp-${k}">
+      <span class="name">${t}</span>
+      <select onchange="setMastery('${k}',this.value)">
+        <option value="not" ${st==='not'?'selected':''}>Not started</option>
+        <option value="learning" ${st==='learning'?'selected':''}>Learning</option>
+        <option value="mastered" ${st==='mastered'?'selected':''}>Mastered ✓</option>
+      </select></div>`;
+  });
+  const DLAB={1:"Basic",2:"Intermediate",3:"Challenge"};
+  html+=`</div><div class="sec"><h3>📝 Practice Quiz <span style="font-size:12px;font-weight:400;color:var(--muted)">(${wk.quiz.length} questions)</span></h3>
+    <div class="qfilter">
+      <button class="on" data-f="0" onclick="filterQ(0)">All</button>
+      <button data-f="1" onclick="filterQ(1)">🟢 Basic</button>
+      <button data-f="2" onclick="filterQ(2)">🟡 Intermediate</button>
+      <button data-f="3" onclick="filterQ(3)">🔴 Challenge</button>
+    </div>`;
+  wk.quiz.forEach((q,qi)=>{
+    const d=q.d||1;
+    html+=`<div class="q" id="q-${qi}" data-d="${d}"><div class="stem"><span class="dbadge d${d}">${DLAB[d]}</span>${qi+1}. ${q.stem}</div>`;
+    q.opts.forEach((o,oi)=>{ html+=`<span class="opt" onclick="answer(${n},${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</span>`; });
+    html+=`<div class="exp" id="exp-${qi}">💡 ${q.exp}</div></div>`;
+  });
+  html+=`</div><div class="sec"><h3>🛠 Weekly Mini-Project</h3><div class="proj"><b>Practice:</b> ${wk.project}</div></div>`;
+  // ❓ Ask a Tutor
+  html+=`<div class="sec"><h3>❓ Ask a Tutor</h3>
+    <p class="askhint">Stuck on anything from this week? Type your question and pick a tutor. It opens with your course and topic already filled in, so you get a clear explanation with an example.</p>
+    <textarea class="askbox" id="askbox" placeholder="e.g. I don't understand how a for-loop works. Can you explain it simply?"></textarea>
+    <div class="askbtns">
+      <button class="btn" onclick="askAI('chatgpt',${n})">💬 Ask ChatGPT</button>
+      <button class="btn" onclick="askAI('claude',${n})">🤖 Ask Claude</button>
+      <button class="btn" onclick="askAI('perplexity',${n})">🔎 Ask Perplexity</button>
+      <button class="btn" onclick="askAI('google',${n})">🌐 Google it</button>
+    </div></div>`;
+  // 📺 Still confused? Watch & Learn
+  const rl=RES[id]||[];
+  html+=`<div class="sec"><h3>📺 Still confused? Watch &amp; Learn</h3>
+    <p class="askhint">Video lessons and trusted guides for this topic. Great when you want to see it explained step by step.</p>
+    <div class="reslinks">
+      <a class="reslink" href="${ytQuery(n)}" target="_blank" rel="noopener">▶️ YouTube videos for: ${wk.title}</a>`;
+  rl.forEach(r=>{ html+=`<a class="reslink" href="${r[1]}" target="_blank" rel="noopener">${r[0]}</a>`; });
+  html+=`</div></div>`;
+  // 📚 Past Exams & Real UCI Question Banks
+  const ex=EXAMS[id]||[];
+  html+=`<div class="sec"><h3>📚 Past Exams &amp; Real UCI Question Banks</h3>
+    <p class="askhint">Actual past exams and practice question banks from UCI professors and the Math Department. Do these timed and closed-book before the real test — it's the best way to know you're truly ready.</p>
+    <div class="reslinks">`;
+  ex.forEach(r=>{ html+=`<a class="reslink" href="${r[1]}" target="_blank" rel="noopener">${r[0]}</a>`; });
+  html+=`</div></div>`;
+  html+=`</div>`;
+  panel.innerHTML=html; panel.classList.add('open'); panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+const RES={
+ ics31:[["🐍 Python.org — official beginner tutorial","https://docs.python.org/3/tutorial/"],["🎓 freeCodeCamp — Python for Beginners (full course)","https://www.youtube.com/results?search_query=freecodecamp+python+for+beginners+full+course"],["▶️ Corey Schafer — Python tutorials","https://www.youtube.com/results?search_query=corey+schafer+python+beginner+tutorial"]],
+ ics32:[["🐍 Python.org — modules, files & exceptions","https://docs.python.org/3/tutorial/"],["🎮 Real Python — tkinter & PyGame projects","https://www.youtube.com/results?search_query=python+tkinter+pygame+tutorial+beginner"],["▶️ Tech With Tim — Python projects","https://www.youtube.com/results?search_query=tech+with+tim+python+tutorial"]],
+ ics33:[["🐍 Python.org — data model & advanced features","https://docs.python.org/3/reference/datamodel.html"],["⚡ mCoding — intermediate/advanced Python","https://www.youtube.com/results?search_query=mcoding+python+decorators+generators"],["▶️ ArjanCodes — Pythonic design & decorators","https://www.youtube.com/results?search_query=arjancodes+decorators+dataclasses+python"]],
+ math2a:[["📘 Khan Academy — Calculus 1 (free full course)","https://www.khanacademy.org/math/calculus-1"],["👨‍🏫 Professor Leonard — Calculus 1 lectures","https://www.youtube.com/results?search_query=professor+leonard+calculus+1"],["🎨 3Blue1Brown — Essence of Calculus","https://www.youtube.com/results?search_query=3blue1brown+essence+of+calculus"]]
+};
+const EXAMS={
+ ics31:[["📄 Prof. David Kay — past ICS 31 midterms WITH answers","https://ics.uci.edu/~kay/courses/31/quiz/"],["📝 Real past ICS 31 Midterm 2 (PDF)","https://ics.uci.edu/~kay/courses/31/quiz/f16.mt2.pdf"],["📘 Prof. Pattis — ICS 31 course, quizzes & practice","https://ics.uci.edu/~pattis/ICS-31/index.html"]],
+ ics32:[["📘 Prof. Thornton — ICS 32 course reference & materials","https://ics.uci.edu/~thornton/ics32/CourseReference.html"],["🗂 Prof. Thornton — ICS 32 full course (schedule, projects, notes)","https://ics.uci.edu/~thornton/ics32/"]],
+ ics33:[["📘 Prof. Pattis — ICS 33 course (quizzes & exams)","https://ics.uci.edu/~pattis/ICS-33/index.html"],["✅ Real ICS 33 quiz WITH full solutions (PDF)","https://ics.uci.edu/~pattis/ICS-33/solutions/ICS33q1spr22.pdf"]],
+ math2a:[["📄 UCI Math Dept — Math 2A Final Exam Review (official PDF)","https://www.math.uci.edu/sites/default/files/2A-Final-Review.pdf"],["🗂 UCI Math — official 2A/2B resources & sample exams","https://www.math.uci.edu/undergraduate/courses/calculus-2a2b-resources"],["🎥 UCI OpenCourseWare — Math 2A lectures + Final Exam Review","https://ocw.uci.edu/courses/math_2a_calculus_i.html"]]
+};
+function askAI(which,n){
+  const wk=ACT().weeks.find(x=>x.n===n);
+  const q=(document.getElementById('askbox')||{}).value||'';
+  const ctx=`I'm a UC Irvine Computer Science freshman studying ${ACT().code} (${ACT().name}), Week ${n}: ${wk.title}. Please act as a patient tutor and explain clearly in simple English with a small example. My question: ${q||'Please explain this week\'s topics in simple terms with an example.'}`;
+  const e=encodeURIComponent(ctx);
+  const urls={chatgpt:'https://chatgpt.com/?q='+e,claude:'https://claude.ai/new?q='+e,perplexity:'https://www.perplexity.ai/search?q='+e,google:'https://www.google.com/search?q='+e};
+  window.open(urls[which]||urls.google,'_blank','noopener');
+}
+function ytQuery(n){
+  const wk=ACT().weeks.find(x=>x.n===n);
+  const subj=state.active==='math2a'?'calculus':'python programming';
+  return 'https://www.youtube.com/results?search_query='+encodeURIComponent(subj+' '+wk.title+' tutorial');
+}
+function filterQ(f){
+  panel.querySelectorAll('.qfilter button').forEach(b=>b.classList.toggle('on',+b.dataset.f===f));
+  panel.querySelectorAll('.q').forEach(q=>{ q.style.display=(f===0||+q.dataset.d===f)?'':'none'; });
+}
+function closePanel(){ panel.classList.remove('open'); }
+function setMastery(k,v){ state.mastery[k]=v; save();
+  const el=document.getElementById('kp-'+k); if(el) el.className='kp '+(v==='mastered'?'mastered':v==='learning'?'learning':'');
+  renderWeeks();
+}
+function answer(n,qi,oi){
+  const wk=ACT().weeks.find(x=>x.n===n); const q=wk.quiz[qi];
+  const box=document.getElementById('q-'+qi); if(box.dataset.done) return; box.dataset.done="1";
+  box.querySelectorAll('.opt').forEach((el,i)=>{ el.style.cursor='default';
+    if(i===q.a) el.classList.add('correct'); if(i===oi&&oi!==q.a) el.classList.add('wrong'); });
+  document.getElementById('exp-'+qi).classList.add('show');
+  if(oi!==q.a){
+    state.mistakes[state.active].push({week:n,stem:q.stem,chosen:q.opts[oi],correct:q.opts[q.a],exp:q.exp});
+    save(); renderMistakes(); renderWeak();
+  }
+}
+
+// ================= MISTAKES =================
+function renderMistakes(){
+  document.getElementById('mCourse').textContent='— '+ACT().code;
+  const arr=state.mistakes[state.active]||[];
+  const el=document.getElementById('mistakeList');
+  if(!arr.length){ el.innerHTML='<p class="empty">No mistakes yet. Take the quizzes — any question you get wrong is automatically collected here so you can rework it before exams.</p>'; return; }
+  el.innerHTML=arr.map((m,idx)=>`<div class="mrow">
+    <span class="wkt">WEEK ${m.week}</span>
+    <button class="btn ghost" style="float:right;padding:2px 8px;font-size:11px" onclick="delMistake(${idx})">remove</button>
+    <div style="margin:4px 0"><b>${m.stem}</b></div>
+    <div>You chose: <span style="color:var(--bad)">${m.chosen}</span> · Correct: <span style="color:var(--good)">${m.correct}</span></div>
+    <div style="color:var(--muted);font-size:12px;margin-top:3px">💡 ${m.exp}</div></div>`).join('');
+}
+function delMistake(i){ state.mistakes[state.active].splice(i,1); save(); renderMistakes(); renderWeak(); }
+
+// ================= WEAK AREAS & TARGETED PRACTICE =================
+const TIPS={
+ ics31:"Retype each code example by hand, then predict the output <i>before</i> running it. For loops, write the value of every variable after each pass on paper. Redo each missed question until you get it right twice in a row.",
+ ics32:"Trace the program line by line on paper — for file/exception and recursion questions, write down what each call returns. Rebuild the small program yourself instead of only reading it, then rerun the missed questions until clean.",
+ ics33:"For Big-O, literally count the nested loops. For data-model / generators / decorators, write a 3-line example and run it to see the behavior. Redo the missed questions until the pattern is automatic, not memorized.",
+ math2a:"Rework each missed problem on paper from scratch — don't just read the solution. Then do 3 similar problems in a row. If you can't finish one without peeking, it's not solid yet; repeat until you can."
+};
+function weakWeeks(){
+  const arr=state.mistakes[state.active]||[];
+  const cnt={};
+  arr.forEach(m=>{ cnt[m.week]=(cnt[m.week]||0)+1; });
+  return Object.keys(cnt).map(Number).map(w=>({w,n:cnt[w]})).sort((a,b)=>b.n-a.n||a.w-b.w);
+}
+function renderWeak(){
+  const host=document.getElementById('weakspots'); if(!host) return;
+  const ww=weakWeeks();
+  let html=`<h2>🎯 Weak Areas &amp; Targeted Practice <span style="font-size:12px;color:var(--muted)">— ${ACT().code}</span></h2>`;
+  if(!ww.length){
+    html+=`<p class="sub">As John takes the quizzes, the topics he misses most automatically show up here — each with a study tip and a <b>Focused Practice drill that repeats those exact questions until he gets every one right</b>. Take any week's quiz to activate this.</p>`;
+    host.innerHTML=html; return;
+  }
+  html+=`<p class="sub">Based on the questions John missed, these are the areas to strengthen (most-missed first). Run the Focused Practice drill: it re-serves each question — and any he gets wrong goes back in the queue — until the whole set is correct.</p>`;
+  ww.forEach(({w,n})=>{
+    const wk=ACT().weeks.find(x=>x.n===w); if(!wk) return;
+    html+=`<div class="wcard">
+      <div class="wh">Week ${w} — ${wk.title}</div>
+      <div class="wmeta">Missed ${n} question${n>1?'s':''} · Topics: ${wk.topics.join(' · ')}</div>
+      <div class="tip"><b>💪 How to strengthen this:</b> ${TIPS[state.active]||''}</div>
+      <div class="wbtns">
+        <button class="btn" onclick="startDrill(${w})">🎯 Focused Practice (repeat till correct)</button>
+        <button class="btn ghost" onclick="openWeek(${w})">Open Week ${w}</button>
+        <button class="btn ghost" onclick="tutorWeak(${w})">❓ Ask a Tutor</button>
+      </div></div>`;
+  });
+  host.innerHTML=html;
+}
+function tutorWeak(w){
+  const wk=ACT().weeks.find(x=>x.n===w); if(!wk) return;
+  const ctx=`I'm a UC Irvine Computer Science freshman studying ${ACT().code} (${ACT().name}), Week ${w}: ${wk.title}. I keep getting questions wrong on these topics: ${wk.topics.join(', ')}. Please act as a patient tutor: explain each of these simply with a small example, then give me 3 practice questions (with answers) to strengthen this exact area.`;
+  window.open('https://chatgpt.com/?q='+encodeURIComponent(ctx),'_blank','noopener');
+}
+let D=null;
+function startDrill(w){
+  const wk=ACT().weeks.find(x=>x.n===w); if(!wk) return;
+  const missed=new Set((state.mistakes[state.active]||[]).filter(m=>m.week===w).map(m=>m.stem));
+  const qs=wk.quiz.slice().sort((a,b)=>(missed.has(b.stem)?1:0)-(missed.has(a.stem)?1:0));
+  D={week:w,title:wk.title,queue:qs.slice(),solved:new Set(),total:wk.quiz.length};
+  document.getElementById('drillOv').classList.add('open');
+  renderDrill();
+}
+function renderDrill(){
+  const box=document.getElementById('drill'); box.dataset.done='';
+  if(!D.queue.length){
+    box.innerHTML=`<div class="dh"><h3>🎯 Focused Practice</h3><button class="close" onclick="closeDrill()">✕</button></div>
+      <div class="ddone"><div class="big">🎉</div><p style="font-size:16px"><b>All correct!</b></p>
+      <p>You cleared every question in <b>Week ${D.week} — ${D.title}</b>.</p>
+      <p style="color:var(--muted);font-size:13px">That's a strong sign this area is solid now. Redo this drill once more the day before the exam to lock it in.</p>
+      <button class="btn" onclick="closeDrill()">Done</button></div>`;
+    return;
+  }
+  const q=D.queue[0];
+  const pct=Math.round(D.solved.size/D.total*100);
+  let html=`<div class="dh"><h3>🎯 Week ${D.week} Drill</h3><button class="close" onclick="closeDrill()">✕</button></div><div class="db">
+    <div class="dprog">${D.solved.size} / ${D.total} cleared · ${D.queue.length} left in queue
+      <div class="pbar"><span style="width:${pct}%"></span></div></div>
+    <div class="dstem">${q.stem}</div>`;
+  q.opts.forEach((o,oi)=>{ html+=`<span class="dopt" onclick="drillAns(${oi})">${String.fromCharCode(65+oi)}. ${o}</span>`; });
+  html+=`<div class="dexp" id="dexp">💡 ${q.exp}</div><div id="dnext"></div></div>`;
+  box.innerHTML=html;
+}
+function drillAns(oi){
+  const box=document.getElementById('drill'); if(box.dataset.done) return; box.dataset.done='1';
+  const q=D.queue[0];
+  box.querySelectorAll('.dopt').forEach((el,i)=>{ el.style.cursor='default';
+    if(i===q.a) el.classList.add('correct'); if(i===oi&&oi!==q.a) el.classList.add('wrong'); });
+  document.getElementById('dexp').classList.add('show');
+  const correct=(oi===q.a);
+  D.queue.shift();
+  if(correct){ D.solved.add(q.stem); }
+  else { D.queue.push(q); }
+  const msg=correct?'✅ Correct!':"❌ Not quite — this one goes back in the queue, so you'll see it again until you nail it.";
+  document.getElementById('dnext').innerHTML=`<div style="font-size:13px;margin:10px 0;font-weight:600;color:${correct?'var(--good)':'var(--bad)'}">${msg}</div>
+    <button class="btn" onclick="renderDrill()">${D.queue.length?'Next →':'Finish 🎉'}</button>`;
+}
+function closeDrill(){ document.getElementById('drillOv').classList.remove('open'); D=null; renderWeak(); }
+
+// ================= COUNTDOWN =================
+const sd=document.getElementById('startDate');
+function renderCountdown(){
+  sd.value=state.starts[state.active];
+  const start=new Date(state.starts[state.active]+"T00:00:00"); const now=new Date(); const day=86400000;
+  const since=Math.floor((now-start)/day); const curWeek=Math.floor(since/7)+1;
+  let html='';
+  if(since<0) html=`📅 <span><b>${Math.abs(since)}</b> days until ${ACT().term} quarter starts</span>`;
+  else if(curWeek>=1&&curWeek<=11) html=`📅 <span>Currently <b>Week ${curWeek}</b></span>`;
+  else html=`📅 <span>${ACT().term} quarter has ended</span>`;
+  const ews=Object.keys(ACT().exams).map(Number).filter(w=>w>=curWeek).sort((a,b)=>a-b);
+  if(ews.length){ const ew=ews[0]; const ed=new Date(start.getTime()+((ew-1)*7)*day);
+    const dl=Math.ceil((ed-now)/day);
+    html+=` <span class="exam">⏰ ${ACT().exams[ew]} in ~${dl>0?dl:0} days (Week ${ew})</span>`; }
+  document.getElementById('countdown').innerHTML=html;
+}
+sd.onchange=()=>{ state.starts[state.active]=sd.value; save(); renderCountdown(); };
+
+function resetCourse(){
+  if(confirm('Clear all progress and the mistake notebook for '+ACT().code+'?')){
+    for(const k in state.mastery){ if(k.startsWith(state.active+'-')) delete state.mastery[k]; }
+    state.mistakes[state.active]=[]; save(); renderAll();
+  }
+}
+
+function renderAll(){ renderTabs(); renderWeeks(); renderMistakes(); renderWeak(); renderCountdown(); }
+renderAll();
+setInterval(renderCountdown,3600000);
+
+// PWA: register service worker for offline + home-screen install (only over http/https)
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

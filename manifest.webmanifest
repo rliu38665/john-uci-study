@@ -1,0 +1,15 @@
+{
+  "name": "John's UCI CS Study Hub",
+  "short_name": "John Study",
+  "description": "UC Irvine CS freshman study tracker — ICS 31/32/33 + MATH 2A",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0064a4",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
