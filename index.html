@@ -79,6 +79,13 @@ $("f").addEventListener("submit",ev=>{
   let saved=null; try{saved=localStorage.getItem(KEY_LS);}catch(e){}
   if(saved){ await unlock(saved,true); }
 })();
+// Register the locked service worker and take over from any stale worker.
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(rs=>{
+    rs.forEach(r=>{ if(r.active && r.active.scriptURL && !r.active.scriptURL.endsWith('sw.js')) r.unregister(); });
+  }).catch(()=>{});
+  navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});
+}
 </script>
 </body>
 </html>
